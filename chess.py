@@ -8,8 +8,10 @@ import colorama
 from colorama import Fore, Back, Style
 
 # Black Pieces: Back.BLACK + Fore.WHITE + 
-# White Pieces: Back.RESET + Fore.RESET + 
-# Style.RESET_ALL
+# White Pieces: Back.WHITE + Fore.RESET + 
+# Board: Style.RESET_ALL
+
+
 
 # id = P pawn, R rook, N knight, B bishop, Q queen, K king
 # color = False black, True white
@@ -117,10 +119,11 @@ class Board:
 			print(" " + piece + " ",end="")
 		else:
 			if(piece.getColor()):
-				print(Back.RESET + Fore.RESET + " " + piece.getID() + " ",end="")
+				print(Back.WHITE + Fore.RESET + " " + piece.getID() + " ",end="")
+				print(Style.RESET_ALL + "",end="")
 			else:
 				print(Back.BLACK + Fore.WHITE +  " " + piece.getID() + " ",end="")
-				print(Back.RESET + Fore.RESET +  "",end="")
+				print(Style.RESET_ALL + "",end="")
 	
 	def printBoard(self):
 		print("---------------------------------")
@@ -131,10 +134,80 @@ class Board:
 			print("|")
 			print("---------------------------------")
 			
+	def getPiece(self,location):
+		pass
+	
+class Game:
+	
+	_playerturn = True
+	_origin = ''
+	_destination = ''
+	
+	def __init__(self):
+		self._playerturn = True
+	
+	def printPlayerTurn(self):
+		if(self._playerturn):
+			print(Back.WHITE + Fore.RESET + "Player White ->",end="")
+			print(Style.RESET_ALL + "")
+		else:
+			print(Back.BLACK + Fore.WHITE + "Player Black ->",end="")
+			print(Style.RESET_ALL + "")
+	
+	def switchPlayerTurn(self):
+		self._playerturn = not self._playerturn
+	
+	# converts chess square "c2" into string of number for board array "12" -> [1][2] (number switch is due to "col,row" -> [row][col])
+	def chessToMatrix(self,location):
+		result = ''
+		if len(location) != 2:
+			return False
+		else:
+			loc = list(location)
+			letter = {"a":0,"b":1,"c":2,"d":3,"e":4,"f":5,"g":6,"h":7}
+			number = {1:0,2:1,3:2,4:3,5:4,6:5,7:6,8:7}
+			if loc[0] in letter:
+				result += str(letter[loc[0]])
+			else:
+				return False
+			if int(loc[1]) in number:
+				result += str(number[int(loc[1])])
+			else:
+				return False
+			return result
+
+	def askSquareOrigin(self):
+		self._origin = input('Origin: ')
+		
+	def askSquareDestination(self):
+		self._destination = input('Destination: ')
+		
+	def getOrigin(self):
+		return self._origin
+
+	def getDestination(self):
+		return self._destination
+				
+			
 # This is the actual program code
 def main():
+	# start up procedure
 	chess = Board()
-	chess.printBoard()
+	game = Game()
+	
+	battle = True
+	
+	# game logic goes here
+	while(battle):
+		# player turn
+		game.printPlayerTurn()
+		game.askSquareOrigin()
+		game.askSquareDestination()
+		#game.chessToMatrix(game.getOrigin())
+		
+		# result of turn
+		game.switchPlayerTurn()
+		chess.printBoard()
 
 # The program executes here
 if __name__ == "__main__":
