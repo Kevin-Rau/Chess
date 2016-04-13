@@ -131,5 +131,12 @@ class Board:
 			print("|")
 			print("---------------------------------")
 			
-chess = Board()
-chess.printBoard()
+# This is the actual program code
+def main():
+	chess = Board()
+	chess.printBoard()
+
+# The program executes here
+if __name__ == "__main__":
+    main()
+
