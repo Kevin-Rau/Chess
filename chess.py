@@ -27,7 +27,7 @@ class Piece:
 		self.setID(id)
 		self.setColor(color)
 		self.setState(1)
-		self.move = move
+		self.moveType = move
 		
 	def setID(self,id):
 		self._id = id
@@ -49,9 +49,9 @@ class Piece:
 	
 	# this will be needed for upgrading pawn, need to change id as well...
 	def setMove(self,move):
-		self.move = move
+		self.moveType = move
 	
-	def move(self):
+	def moveType(self,orig,dest):
 		pass
 		
 	# this is for debugging only!!
@@ -66,28 +66,43 @@ class Piece:
 			s = 'dead'
 		print("id: " + self._id + " | color: " + c + " | state: " + s)
 
-def King():
-	pass
+# piece function are essentially just validations of orig->dest moves
+# if valid, return a list of squares the piece must traverse, so board can validate those squares are empty
+def King(orig,dest):
+	return False
 
-def Queen():
-	pass
+def Queen(orig,dest):
+	return False
 
-def Bishop():
-	pass
+def Bishop(orig,dest):
+	return False
 
-def Knight():
-	pass
+def Knight(orig,dest):
+	return False
 
-def Rook():
-	pass
+def Rook(orig,dest):
+	if orig[0] == dest[0]:
+		return True
+	elif orig[1] == dest[1]:
+		return True
+	else:
+		return False
 
-def Pawn():
-	pass
+def UpPawn(orig,dest):
+	if(orig[0] - 1 == dest[0]):
+		return True
+	else:
+		return False
+	
+def DownPawn(orig,dest):
+	if(orig[0] + 1 == dest[0]):
+		return True
+	else:
+		return False
 
 class Board:
-	 
-	 # board will store piece positions
-	 # death will store dead pieces
+	# board will store piece positions
+	# death will store dead pieces
 	_board = [[' ' for x in range(8)] for x in range(8)]
 	_death = []
 	
@@ -101,9 +116,9 @@ class Board:
 		self._board[0][6] = Piece('N',False,Knight)
 		self._board[0][7] = Piece('R',False,Rook)
 		for i in range(8):
-			self._board[1][i] = Piece('P',False,Pawn)
+			self._board[1][i] = Piece('P',False,DownPawn)
 		for i in range(8):
-			self._board[6][i] = Piece('P',True,Pawn)
+			self._board[6][i] = Piece('P',True,UpPawn)
 		self._board[7][0] = Piece('R',True,Rook)
 		self._board[7][1] = Piece('N',True,Knight)
 		self._board[7][2] = Piece('B',True,Bishop)
@@ -134,14 +149,51 @@ class Board:
 			print("|")
 			print("---------------------------------")
 			
-	def getPiece(self,location):
-		pass
+	def getPiece(self,row,col):
+		return self._board[row][col]
+		
+	def setPiece(self,row,col,piece):
+		self._board[row][col] = piece
+	
+	def execute(self,orig,dest):
+		print(orig)
+		print(dest)
+		
+		# get origin piece
+		piece = self.getPiece(orig[0],orig[1])
+		if(type(piece) is str):
+			print("No Origin Piece Selected")
+			return False
+		
+		# get list of squares piece should move
+		squares = piece.moveType(orig,dest)
+		if(squares == False):
+			print("Invalid Move")
+			return False
+		elif(squares == True):
+			pass # single square move, no check needed
+		else:
+			### board needs to check that those spaces are empty ###
+			pass
+		
+		# kill the piece at destination if there was one there
+		attacked = self.getPiece(dest[0],dest[1])
+		if(type(attacked) is not str):
+			attacked.setState(False)
+		
+		# move the piece to the destination
+		self.setPiece(orig[0],orig[1],' ')
+		self.setPiece(dest[0],dest[1],piece)
+		self._board[dest[0]][dest[1]] = piece
+		
+		return True
 	
 class Game:
 	
 	_playerturn = True
-	_origin = ''
-	_destination = ''
+	_origin = [None] * 2
+	_destination = [None] * 2
+	_input = ''
 	
 	def __init__(self):
 		self._playerturn = True
@@ -158,55 +210,79 @@ class Game:
 		self._playerturn = not self._playerturn
 	
 	# converts chess square "c2" into string of number for board array "12" -> [1][2] (number switch is due to "col,row" -> [row][col])
-	def chessToMatrix(self,location):
-		result = ''
+	# parameter: True = origin, False = destination
+	def chessToMatrix(self,bool):
+		location = self._input
+		result = [None] * 2
 		if len(location) != 2:
 			return False
 		else:
 			loc = list(location)
 			letter = {"a":0,"b":1,"c":2,"d":3,"e":4,"f":5,"g":6,"h":7}
 			number = {1:0,2:1,3:2,4:3,5:4,6:5,7:6,8:7}
-			if loc[0] in letter:
-				result += str(letter[loc[0]])
+			if loc[0].lower() in letter:
+				result[1] = int(letter[loc[0].lower()])
 			else:
 				return False
 			if int(loc[1]) in number:
-				result += str(number[int(loc[1])])
+				result[0] = int(number[int(loc[1])])
+				if(bool):
+					self._origin = result
+					return True
+				else:
+					self._destination = result
+					return True
 			else:
 				return False
-			return result
 
 	def askSquareOrigin(self):
-		self._origin = input('Origin: ')
+		self._input = input('Origin: ')
+		valid = self.chessToMatrix(True)
+		while(not valid):
+			self._input = input('Incorrect Input. Try Again.\nOrigin: ')
+			valid = self.chessToMatrix(True)
+			### validate that player selected their own piece ###
+			
 		
 	def askSquareDestination(self):
-		self._destination = input('Destination: ')
+		self._input = input('Destination: ')
+		valid = self.chessToMatrix(False)
+		while(not valid):
+			self._input = input('Incorrect Input. Try Again.\nDestination: ')
+			valid = self.chessToMatrix(True)
 		
 	def getOrigin(self):
 		return self._origin
 
 	def getDestination(self):
 		return self._destination
-				
+		
+	def execPlayerTurn(self,board):
+		valid = False
+		while(not valid):
+			self.askSquareOrigin()
+			self.askSquareDestination()
+			valid = board.execute(self._origin,self._destination)
+		self.switchPlayerTurn()
 			
 # This is the actual program code
 def main():
 	# start up procedure
+	print(Style.RESET_ALL + "",end="") # in case user uses non-white terminal
 	chess = Board()
 	game = Game()
 	
 	battle = True
 	
+	chess.printBoard()
+	
 	# game logic goes here
 	while(battle):
 		# player turn
 		game.printPlayerTurn()
-		game.askSquareOrigin()
-		game.askSquareDestination()
-		#game.chessToMatrix(game.getOrigin())
+		game.execPlayerTurn(chess)
 		
 		# result of turn
-		game.switchPlayerTurn()
 		chess.printBoard()
 
 # The program executes here
