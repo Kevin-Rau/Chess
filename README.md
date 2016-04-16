@@ -26,14 +26,14 @@ idea for connecting two players to a game:
 
 **Create a Save class:**
 
-Ryan2 implemnting Save
+Ryan2 implementing Save
 
 1. First
-  - detect user pressing "s"
+  - detect user pressing "s" (save)
   - store board as .json file
   - display "game saved"
 2. Second
-  - detect user pressing "q"
+  - detect user pressing "q" (quit/forfeit)
   - display "are you sure?"
   - return to menu
 
@@ -44,6 +44,12 @@ Ryan2 implementing Queen
 **Create Knight Move Validation**
 
 Ryan2 implementing Knight
+
+**Update Pawn Piece:**
+
+**Detect King Death:**
+
+**Add Clock Class:**
   
 ###Main Game Flow
 
