@@ -37,7 +37,7 @@ avoiding usernames & stats for last, since this might require connecting to a da
   
 ###Main Game Flow
 
-The most important functions are Game.execPlayerturn() & board.execute(). They handle a lot of the game's logic flow
+The most important functions are Game.execPlayerturn() & Board.execute(). They handle a lot of the game's logic flow
 
 One: game.execPlayerTurn(chess)
   - get first square
