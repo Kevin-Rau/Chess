@@ -32,12 +32,12 @@ idea for connecting two players to a game:
   - detect user pressing "q"
   - display "are you sure?"
   - return to menu
-  
-**Create King Move Validation**
 
 **Create Queen Move Validation**
 
 **Create Bishop Move Validation**
+
+I (eric) am implmenting Bishop right now
 
 **Create Knight Move Validation**
   
