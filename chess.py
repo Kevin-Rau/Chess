@@ -1,15 +1,27 @@
 #!/usr/local/bin/python3
 
-# Code by Eric Fossas
+##############################
+# Code by: 
+# Eric Fossas
+# 
+# 
+# 
+# 
+##############################
 
-# Download colorama, cd into the colorama folder and run: python3 setup.py install
+'''
+INSTRUCTIONS:
+
+Download colorama, cd into the colorama folder and run: python3 setup.py install
+
+'''
+
+###
+### MODULES
+###
 
 import colorama
 from colorama import Fore, Back, Style
-
-# Black Pieces: Back.BLACK + Fore.WHITE + 
-# White Pieces: Back.WHITE + Fore.RESET + 
-# Board: Style.RESET_ALL
 
 ###
 ### HELPER FUNCTIONS
@@ -82,10 +94,6 @@ class Piece:
 ###
 ### PIECE MOVETYPES
 ###
-
-# piece function are essentially just validations of orig->dest moves
-# if valid, return a list of squares the piece must traverse, so board can validate those squares are empty
-# do not include the origin and destination squares
 def King(orig,dest,board):
 	return False
 
@@ -149,13 +157,17 @@ def Rook(orig,dest,board):
 		return False
 
 def UpPawn(orig,dest,board):
-	if orig[0] - 1 == dest[0] or orig[0] - 2 == dest[0]:
+	if orig[0] == 6 and (orig[0] - 1 == dest[0] or orig[0] - 2 == dest[0]):
+		return True
+	if orig[0] - 1 == dest[0]:
 		return True
 	else:
 		return False
 	
 def DownPawn(orig,dest,board):
-	if orig[0] + 1 == dest[0] or orig[0] + 2 == dest[0]:
+	if orig[0] == 1 and (orig[0] + 1 == dest[0] or orig[0] + 2 == dest[0]):
+		return True
+	if orig[0] + 1 == dest[0]:
 		return True
 	else:
 		return False
@@ -165,9 +177,7 @@ def DownPawn(orig,dest,board):
 ###
 class Board:
 	# board will store piece positions
-	# death will store dead pieces
 	_board = [[' ' for x in range(8)] for x in range(8)]
-	_death = []
 	
 	def __init__(self,unicode):
 		if unicode:
@@ -219,7 +229,7 @@ class Board:
 		if(type(piece) is str):
 			print(" " + piece + " ",end="")
 		else:
-			if(piece.getColor()):
+			if piece.getColor():
 				print(Back.WHITE + Fore.RESET + " " + piece.getID() + " ",end="")
 				print(Style.RESET_ALL + "",end="")
 			else:
@@ -256,16 +266,19 @@ class Board:
 			print("* Incorrect Origin Piece Color Selected *")
 			return False
 		
-		# get list of squares piece should move
+		# check that move is valid
 		if not piece.moveType(orig,dest,self._board):
 			print("Invalid Move")
 			return False
 		
 		# kill the piece at destination if there was one there
 		attacked = self.getPiece(dest[0],dest[1])
-		if(type(attacked) is not str):
-			### check that the player isn't killing of their own pieces ###
-			attacked.setState(False)
+		if type(attacked) is not str:
+			if attacked.getColor() != player:
+				print("* You Cannot Attack Your Own Piece *")
+				return False
+			else:
+				attacked.setState(False)
 		
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
@@ -331,7 +344,6 @@ class Game:
 		while(not valid):
 			self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
 			valid = self.chessToMatrix(True)
-			### validate that player selected their own piece ###
 			
 		
 	def askSquareDestination(self):
@@ -377,7 +389,9 @@ def main():
 		# result of turn
 		chess.printBoard()
 
-# The program executes here
+###
+### EXECUTE PROGRAM HERE
+###
 if __name__ == "__main__":
     main()
 
