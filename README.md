@@ -5,22 +5,28 @@ An object oriented javascript chess game
 
 **Create a menu class:**
 
+0. Start
+  - enter username (name)
+  - exit (yes/no)
 1. First
   - new game (yes/no)
   - load game (yes/no)
-  - exit (yes/no)
 2. Second
   - use unicode (yes/no)
 3. Third
   - display this menu at the start of main(), and just store user input
-  
-avoiding usernames & stats for last, since this might require connecting to a database
+
+idea for connecting two players to a game:
+  - in json file, have two flags that are decremented when a player checks the game out
+  - that way, only two players can connect to a game
+  - after every move, save the entire board to the .json file
+  - when players exit, increment the flags
 
 **Create a save class:**
 
 1. First
   - detect user pressing "s"
-  - store board in file
+  - store board as .json file
   - display "game saved"
 2. Second
   - detect user pressing "q"
