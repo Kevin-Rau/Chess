@@ -231,18 +231,64 @@ def Rook(orig,dest,board):
 		return False
 
 def UpPawn(orig,dest,board):
-	if orig[0] == 6 and (orig[0] - 1 == dest[0] or orig[0] - 2 == dest[0]):
-		return True
-	if orig[0] - 1 == dest[0]:
-		return True
+	squares = []
+	
+	# first move double space move
+	if orig[0] == 6 and orig[1] == dest[1] and orig[0] - 2 == dest[0]:
+		squares.append((orig[0] - 1,dest[1]))
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	# regular singe single space move
+	elif orig[0] - 1 == dest[0] and orig[1] == dest[1]:
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	# diagnoal attack
+	elif orig[0] - 1 == dest[0] and (orig[1] == dest[1] + 1 or orig[1] == dest[1] - 1):
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return False
+		else:
+			return True
 	else:
 		return False
 	
 def DownPawn(orig,dest,board):
-	if orig[0] == 1 and (orig[0] + 1 == dest[0] or orig[0] + 2 == dest[0]):
-		return True
-	if orig[0] + 1 == dest[0]:
-		return True
+	squares = []
+	
+	# first move double space move
+	if orig[0] == 1 and orig[1] == dest[1] and orig[0] + 2 == dest[0]:
+		squares.append((orig[0] + 1,dest[1]))
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	# regular singe single space move
+	elif orig[0] + 1 == dest[0] and orig[1] == dest[1]:
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	# diagnoal attack
+	elif orig[0] + 1 == dest[0] and (orig[1] == dest[1] + 1 or orig[1] == dest[1] - 1):
+		squares.append((dest[0],dest[1]))
+		valid = checkEmpty(squares,board)
+		if valid:
+			return False
+		else:
+			return True
 	else:
 		return False
 
@@ -348,7 +394,7 @@ class Board:
 		# kill the piece at destination if there was one there
 		attacked = self.getPiece(dest[0],dest[1])
 		if type(attacked) is not str:
-			if attacked.getColor() != player:
+			if attacked.getColor() == player:
 				print("* You Cannot Attack Your Own Piece *")
 				return False
 			else:
