@@ -3,7 +3,9 @@ An object oriented javascript chess game
 
 ##THINGS TO DO:
 
-**Create a menu class:**
+**Create a Menu class:**
+
+O'Connell/Chase implementing Menu
 
 0. Start
   - enter username (name)
@@ -22,7 +24,9 @@ idea for connecting two players to a game:
   - after every move, save the entire board to the .json file
   - when players exit, increment the flags
 
-**Create a save class:**
+**Create a Save class:**
+
+Ryan2 implemnting Save
 
 1. First
   - detect user pressing "s"
@@ -35,11 +39,11 @@ idea for connecting two players to a game:
 
 **Create Queen Move Validation**
 
-**Create Bishop Move Validation**
-
-I (eric) am implmenting Bishop right now
+Ryan2 implementing Queen
 
 **Create Knight Move Validation**
+
+Ryan2 implementing Knight
   
 ###Main Game Flow
 
