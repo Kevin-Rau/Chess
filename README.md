@@ -1,7 +1,7 @@
 # Chess
 An object oriented javascript chess game
 
-THINGS TO DO:
+##THINGS TO DO:
 
 **Create a menu class:**
 
@@ -35,3 +35,20 @@ avoiding usernames & stats for last, since this might require connecting to a da
 
 **Create Knight Move Validation**
   
+###Main Game Flow
+
+The most important functions are Game.execPlayerturn() & board.execute(). They handle a lot of the game's logic flow
+
+One: game.execPlayerTurn(chess)
+  - get first square
+  - get second square
+  * board.execute(self._playerturn,self._origin,self._destination)
+
+Two: board.execute(self._playerturn,self._origin,self._destination)
+  - get piece at first square
+  - check piece move is valid
+  - kill piece at second square, if there
+  - update the board, hence set squares according to move
+
+
+
