@@ -37,10 +37,6 @@ Ryan2 implementing Save
   - display "are you sure?"
   - return to menu
 
-**Create Queen Move Validation**
-
-Ryan2 implementing Queen
-
 **Create Knight Move Validation**
 
 Ryan2 implementing Knight
