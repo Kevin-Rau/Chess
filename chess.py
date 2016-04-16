@@ -95,7 +95,12 @@ class Piece:
 ### PIECE MOVETYPES
 ###
 def King(orig,dest,board):
-	return False
+	if dest[0] > orig[0] + 1 or dest[0] < orig[0] - 1:
+		return False
+	elif dest[1] > orig[1] + 1 or dest[1] < orig[1] - 1:
+		return False
+	else:
+		return True
 
 def Queen(orig,dest,board):
 	return False
