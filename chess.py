@@ -103,6 +103,122 @@ def King(orig,dest,board):
 		return True
 
 def Queen(orig,dest,board):
+	squares = []
+
+	# horizontal
+	if orig[0] == dest[0]:
+		x = orig[1]
+		y = dest[1]
+		
+		# grab direction
+		if y > x:
+			incr = 1
+		else:
+			incr = -1
+		
+		# grab squares
+		x = x + incr
+		while x != y:
+			squares.append((orig[0],x))
+			x = x + incr
+		
+		# check squares
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+		
+	# vertical
+	elif orig[1] == dest[1]:
+		x = orig[0]
+		y = dest[0]
+		
+		# grab direction
+		if y > x:
+			incr = 1
+		else:
+			incr = -1
+		
+		# grab squares
+		x = x + incr
+		while x != y:
+			squares.append((x,orig[1]))
+			x = x + incr
+
+		# check squares
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+		
+	#diagonal
+
+		# left to right decrease (bi-directional)
+	elif dest[0] - orig[0] == dest[1] - orig[1]:
+		x = orig[0]
+		y = orig[1]
+		z = dest[0]
+		
+		# grab direction
+		if z > x:
+			incr = 1
+		else:
+			incr = -1
+
+		# grab squares
+		x = x + incr
+		y = y + incr
+		while x != z:
+			squares.append((x,y))
+			x = x + incr
+			y = y + incr
+		
+		print(squares)
+		
+		# check squares
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	
+	# left to right increase (bi-directional)
+	elif abs(dest[0] - orig[0]) == abs(dest[1] - orig[1]):
+		x = orig[0]
+		y = orig[1]
+		z = dest[0]
+		
+		print("hi!")
+		
+		# grab direction
+		if z > x:
+			row = 1
+			col = -1
+		else:
+			row = -1
+			col = 1
+
+		# grab squares
+		x = x + row
+		y = y + col
+		while x != z:
+			squares.append((x,y))
+			x = x + row
+			y = y + col
+		
+		print(squares)
+		
+		# check squares
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+	
+	else:
+		return False
 	return False
 
 def Bishop(orig,dest,board):
