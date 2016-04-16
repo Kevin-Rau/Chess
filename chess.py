@@ -12,7 +12,7 @@
 '''
 INSTRUCTIONS:
 
-Download colorama, cd into the colorama folder and run: python3 setup.py install
+Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama folder and run: python3 setup.py install
 
 '''
 
@@ -298,6 +298,7 @@ def DownPawn(orig,dest,board):
 class Board:
 	# board will store piece positions
 	_board = [[' ' for x in range(8)] for x in range(8)]
+	_dead = []
 	
 	def __init__(self,unicode):
 		if unicode:
@@ -398,6 +399,7 @@ class Board:
 				print("* You Cannot Attack Your Own Piece *")
 				return False
 			else:
+				self._dead.append(attacked)
 				attacked.setState(False)
 		
 		# move the piece to the destination
@@ -432,9 +434,9 @@ class Game:
 	def switchPlayerTurn(self):
 		self._playerturn = not self._playerturn
 	
-	# converts chess square "c2" into string of number for board array "12" -> [1][2] (number switch is due to "col,row" -> [row][col])
-	# parameter: True = origin, False = destination
-	def chessToMatrix(self,bool):
+	# converts chess square "c1" into array "02" -> [0][2] (number switch is due to "col,row" -> [row][col])
+	# parameter "boolean": True = sets origin, False = sets destination
+	def chessToMatrix(self,boolean):
 		location = self._input
 		result = [None] * 2
 		if len(location) != 2:
@@ -449,7 +451,7 @@ class Game:
 				return False
 			if int(loc[1]) in number:
 				result[0] = int(number[int(loc[1])])
-				if(bool):
+				if(boolean):
 					self._origin = result
 					return True
 				else:
