@@ -37,10 +37,6 @@ Ryan2 implementing Save
   - display "are you sure?"
   - return to menu
 
-**Create Knight Move Validation**
-
-Ryan2 implementing Knight
-
 **Update Pawn Piece:**
 
 **Detect King Death:**
