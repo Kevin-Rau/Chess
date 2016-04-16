@@ -39,16 +39,14 @@ avoiding usernames & stats for last, since this might require connecting to a da
 
 The most important functions are Game.execPlayerturn() & Board.execute(). They handle a lot of the game's logic flow
 
-One: game.execPlayerTurn(chess)
+game.execPlayerTurn()
   - get first square
   - get second square
-  * board.execute(self._playerturn,self._origin,self._destination)
-
-Two: board.execute(self._playerturn,self._origin,self._destination)
-  - get piece at first square
-  - check piece move is valid
-  - kill piece at second square, if there
-  - update the board, hence set squares according to move
+  * board.execute()
+    - get piece at first square
+    - check piece move is valid
+    - kill piece at second square, if there
+    - update the board, hence set squares according to move
 
 
 
