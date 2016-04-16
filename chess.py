@@ -11,13 +11,25 @@ from colorama import Fore, Back, Style
 # White Pieces: Back.WHITE + Fore.RESET + 
 # Board: Style.RESET_ALL
 
+###
+### HELPER FUNCTIONS
+###
 
+def checkEmpty(squares,board):
+	for square in squares:
+		piece = board[square[0]][square[1]]
+		if type(piece) is not str:
+			return False
+	return True
 
-# id = P pawn, R rook, N knight, B bishop, Q queen, K king
-# color = False black, True white
-# state = False dead, True alive
+###
+### PIECE
+###
 class Piece:
 	
+	# id = P pawn, R rook, N knight, B bishop, Q queen, K king
+	# color = False black, True white
+	# state = False dead, True alive
 	_id = ''
 	_color = False 
 	_state = False
@@ -66,67 +78,141 @@ class Piece:
 			s = 'dead'
 		print("id: " + self._id + " | color: " + c + " | state: " + s)
 
+
+###
+### PIECE MOVETYPES
+###
+
 # piece function are essentially just validations of orig->dest moves
 # if valid, return a list of squares the piece must traverse, so board can validate those squares are empty
-def King(orig,dest):
+# do not include the origin and destination squares
+def King(orig,dest,board):
 	return False
 
-def Queen(orig,dest):
+def Queen(orig,dest,board):
 	return False
 
-def Bishop(orig,dest):
+def Bishop(orig,dest,board):
 	return False
 
-def Knight(orig,dest):
+def Knight(orig,dest,board):
 	return False
 
-def Rook(orig,dest):
+def Rook(orig,dest,board):
+	squares = []
+	
 	if orig[0] == dest[0]:
-		return True
+		# grab distance
+		x = orig[1]
+		y = dest[1]
+		
+		# grab direction
+		if y > x:
+			incr = 1
+		else:
+			incr = -1
+		
+		x = x + incr
+		while x != y:
+			squares.append((orig[0],x))
+			x = x + incr
+		
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+		
 	elif orig[1] == dest[1]:
-		return True
+		# grab distance
+		x = orig[0]
+		y = dest[0]
+		
+		# grab direction
+		if y > x:
+			incr = 1
+		else:
+			incr = -1
+		
+		x = x + incr
+		while x != y:
+			squares.append((x,orig[1]))
+			x = x + incr
+
+		valid = checkEmpty(squares,board)
+		if valid:
+			return True
+		else:
+			return False
+		
 	else:
 		return False
 
-def UpPawn(orig,dest):
-	if(orig[0] - 1 == dest[0]):
+def UpPawn(orig,dest,board):
+	if orig[0] - 1 == dest[0] or orig[0] - 2 == dest[0]:
 		return True
 	else:
 		return False
 	
-def DownPawn(orig,dest):
-	if(orig[0] + 1 == dest[0]):
+def DownPawn(orig,dest,board):
+	if orig[0] + 1 == dest[0] or orig[0] + 2 == dest[0]:
 		return True
 	else:
 		return False
 
+###
+### BOARD
+###
 class Board:
 	# board will store piece positions
 	# death will store dead pieces
 	_board = [[' ' for x in range(8)] for x in range(8)]
 	_death = []
 	
-	def __init__(self):
-		self._board[0][0] = Piece('R',False,Rook)
-		self._board[0][1] = Piece('N',False,Knight)
-		self._board[0][2] = Piece('B',False,Bishop)
-		self._board[0][3] = Piece('Q',False,Queen)
-		self._board[0][4] = Piece('K',False,King)
-		self._board[0][5] = Piece('B',False,Bishop)
-		self._board[0][6] = Piece('N',False,Knight)
-		self._board[0][7] = Piece('R',False,Rook)
-		for i in range(8):
-			self._board[1][i] = Piece('P',False,DownPawn)
-		for i in range(8):
-			self._board[6][i] = Piece('P',True,UpPawn)
-		self._board[7][0] = Piece('R',True,Rook)
-		self._board[7][1] = Piece('N',True,Knight)
-		self._board[7][2] = Piece('B',True,Bishop)
-		self._board[7][3] = Piece('Q',True,Queen)
-		self._board[7][4] = Piece('K',True,King)
-		self._board[7][5] = Piece('B',True,Bishop)
-		self._board[7][6] = Piece('N',True,Knight)
-		self._board[7][7] = Piece('R',True,Rook)
+	def __init__(self,unicode):
+		if unicode:
+			self._board[0][0] = Piece('\u265C',False,Rook)
+			self._board[0][1] = Piece('\u265E',False,Knight)
+			self._board[0][2] = Piece('\u265D',False,Bishop)
+			self._board[0][3] = Piece('\u265B',False,Queen)
+			self._board[0][4] = Piece('\u265A',False,King)
+			self._board[0][5] = Piece('\u265D',False,Bishop)
+			self._board[0][6] = Piece('\u265E',False,Knight)
+			self._board[0][7] = Piece('\u265C',False,Rook)
+			for i in range(8):
+				self._board[1][i] = Piece('\u265F',False,DownPawn)
+			for i in range(8):
+				self._board[6][i] = Piece('\u2659',True,UpPawn)
+			self._board[7][0] = Piece('\u2656',True,Rook)
+			self._board[7][1] = Piece('\u2658',True,Knight)
+			self._board[7][2] = Piece('\u2657',True,Bishop)
+			self._board[7][3] = Piece('\u2655',True,Queen)
+			self._board[7][4] = Piece('\u2654',True,King)
+			self._board[7][5] = Piece('\u2657',True,Bishop)
+			self._board[7][6] = Piece('\u2658',True,Knight)
+			self._board[7][7] = Piece('\u2656',True,Rook)
+		else:
+			self._board[0][0] = Piece('R',False,Rook)
+			self._board[0][1] = Piece('N',False,Knight)
+			self._board[0][2] = Piece('B',False,Bishop)
+			self._board[0][3] = Piece('Q',False,Queen)
+			self._board[0][4] = Piece('K',False,King)
+			self._board[0][5] = Piece('B',False,Bishop)
+			self._board[0][6] = Piece('N',False,Knight)
+			self._board[0][7] = Piece('R',False,Rook)
+			for i in range(8):
+				self._board[1][i] = Piece('P',False,DownPawn)
+			for i in range(8):
+				self._board[6][i] = Piece('P',True,UpPawn)
+			self._board[7][0] = Piece('R',True,Rook)
+			self._board[7][1] = Piece('N',True,Knight)
+			self._board[7][2] = Piece('B',True,Bishop)
+			self._board[7][3] = Piece('Q',True,Queen)
+			self._board[7][4] = Piece('K',True,King)
+			self._board[7][5] = Piece('B',True,Bishop)
+			self._board[7][6] = Piece('N',True,Knight)
+			self._board[7][7] = Piece('R',True,Rook)
+
 	
 	def printPiece(self,piece):
 		# string = blank square, object = piece
@@ -141,13 +227,18 @@ class Board:
 				print(Style.RESET_ALL + "",end="")
 	
 	def printBoard(self):
+		rowGrid = ['1', '2', '3', '4', '5', '6', '7', '8']
+		
+		print("")
+		print("  A   B   C   D   E   F   G   H  ")
 		print("---------------------------------")
 		for i in range(8):
 			for j in range(8):
 				print("|",end="")
 				self.printPiece(Board._board[i][j])
-			print("|")
+			print("| " + rowGrid[i])
 			print("---------------------------------")
+		print("")
 			
 	def getPiece(self,row,col):
 		return self._board[row][col]
@@ -155,30 +246,25 @@ class Board:
 	def setPiece(self,row,col,piece):
 		self._board[row][col] = piece
 	
-	def execute(self,orig,dest):
-		print(orig)
-		print(dest)
-		
+	def execute(self,player,orig,dest):
 		# get origin piece
 		piece = self.getPiece(orig[0],orig[1])
-		if(type(piece) is str):
-			print("No Origin Piece Selected")
+		if type(piece) is str:
+			print("* No Origin Piece Selected *")
+			return False
+		elif piece.getColor() != player:
+			print("* Incorrect Origin Piece Color Selected *")
 			return False
 		
 		# get list of squares piece should move
-		squares = piece.moveType(orig,dest)
-		if(squares == False):
+		if not piece.moveType(orig,dest,self._board):
 			print("Invalid Move")
 			return False
-		elif(squares == True):
-			pass # single square move, no check needed
-		else:
-			### board needs to check that those spaces are empty ###
-			pass
 		
 		# kill the piece at destination if there was one there
 		attacked = self.getPiece(dest[0],dest[1])
 		if(type(attacked) is not str):
+			### check that the player isn't killing of their own pieces ###
 			attacked.setState(False)
 		
 		# move the piece to the destination
@@ -188,8 +274,12 @@ class Board:
 		
 		return True
 	
+###
+### GAME
+###
 class Game:
 	
+	# playerturn False black, True white
 	_playerturn = True
 	_origin = [None] * 2
 	_destination = [None] * 2
@@ -239,7 +329,7 @@ class Game:
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
 		while(not valid):
-			self._input = input('Incorrect Input. Try Again.\nOrigin: ')
+			self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
 			valid = self.chessToMatrix(True)
 			### validate that player selected their own piece ###
 			
@@ -248,7 +338,7 @@ class Game:
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
 		while(not valid):
-			self._input = input('Incorrect Input. Try Again.\nDestination: ')
+			self._input = input('* Incorrect Input. Try Again. *\nDestination: ')
 			valid = self.chessToMatrix(True)
 		
 	def getOrigin(self):
@@ -262,14 +352,16 @@ class Game:
 		while(not valid):
 			self.askSquareOrigin()
 			self.askSquareDestination()
-			valid = board.execute(self._origin,self._destination)
+			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
 			
-# This is the actual program code
+###
+### MAIN PROGRAM
+###
 def main():
 	# start up procedure
 	print(Style.RESET_ALL + "",end="") # in case user uses non-white terminal
-	chess = Board()
+	chess = Board(False)
 	game = Game()
 	
 	battle = True
