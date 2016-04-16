@@ -290,6 +290,14 @@ def Bishop(orig,dest,board):
 		return False
 
 def Knight(orig,dest,board):
+	#two vertical spaces, one horizontal
+	if abs(dest[0] - orig[0]) == 2 and abs(dest[1] - orig[1]) == 1: 
+		return True
+	#one verical space, two horizontal	
+	elif  abs(dest[0] - orig[0]) == 1 and abs(dest[1] - orig[1]) == 2:
+		return True
+	else: 
+		return False
 	return False
 
 def Rook(orig,dest,board):
