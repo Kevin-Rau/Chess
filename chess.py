@@ -709,7 +709,7 @@ class Menu:
 
 	def gameMode(self):
 		game_list = ["Host A Game", "Load A Game", "Connect To A Game"]
-		menu = SelectionMenu(game_list, "Select an option")
+		menu = SelectionMenu(game_list, "CHESS")
 		menu.show()
 		menu.join()
 		self._gameType = menu.selected_option
