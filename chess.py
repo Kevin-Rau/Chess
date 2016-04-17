@@ -556,6 +556,7 @@ class Game:
 	_destination = [None] * 2
 	_input = ''
 	_saveRequested = False
+	_quitRequested = False
 	
 	def __init__(self):
 		self._playerturn = True
@@ -578,6 +579,9 @@ class Game:
 		if location.lower() == 's':
 			self._saveRequested = True
 			Save.save()
+
+		if location.lower() == 'q':
+			self._quitRequested = True	
 
 		result = [None] * 2
 		if len(location) != 2:
@@ -608,6 +612,15 @@ class Game:
 			if self._saveRequested: 
 				self._input = input('* Game Saved *\nOrigin: ')
 				self._saveRequested = False
+			elif self._quitRequested:
+				self._input = input('Do you really want to quit? (y/n): ')
+				if self._input == 'y':
+					self._input = input('Would you like to save? (y/n): ')
+					if self._input == 'y':
+						Save.save()
+					return
+				self._quitRequested = False	
+				self._input = input('Origin: ')		
 			else:
 				self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
 			valid = self.chessToMatrix(True)
@@ -620,9 +633,18 @@ class Game:
 			if self._saveRequested:
 				self._input = input('* Game Saved *\nDestination: ')
 				self._saveRequested = False
+			elif self._quitRequested:
+				self._input = input('Do you really want to quit? (y/n): ')
+				if self._input == 'y':
+					self._input = input('Would you like to save? (y/n): ')
+					if self._input == 'y':
+						Save.save()
+					return
+				self._quitRequested = False	
+				self._input = input('Destination: ')		
 			else:
 				self._input = input('* Incorrect Input. Try Again. *\nDestination: ')	
-			valid = self.chessToMatrix(True)
+			valid = self.chessToMatrix(False)
 		
 	def getOrigin(self):
 		return self._origin
@@ -634,7 +656,11 @@ class Game:
 		valid = False
 		while(not valid):
 			self.askSquareOrigin()
+			if self._quitRequested:
+				 break
 			self.askSquareDestination()
+			if self._quitRequested:
+				 break
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
 
@@ -666,6 +692,9 @@ def main():
 	
 	# game logic goes here
 	while(battle):
+		if game._quitRequested:
+			print("Goodbye")
+			return
 		# player turn
 		game.printPlayerTurn()
 		game.execPlayerTurn(chess)
