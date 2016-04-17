@@ -20,6 +20,7 @@ Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama 
 ### MODULES
 ###
 import json
+import socket
 import colorama
 from colorama import Fore, Back, Style
 
@@ -670,12 +671,28 @@ class Game:
 ### Save
 ###
 class Save:
-	#Save board state
+	
+	# save board state
 	def save():
 		with open('game.json', 'w') as outfile:
 			json.dump(Board.to_JSON(Board._board), outfile)
 			json.dump(Game._playerturn, outfile)
 		return True
+
+###
+### Connect
+###
+class Connect:
+	
+	_connection = None
+	
+	def __init__(self):
+		self._connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		
+	def connect(self,address):
+		self._connection.connect((address, 8080))
+
+
 
 ###
 ### MAIN PROGRAM
