@@ -11,8 +11,9 @@ O'Connell/Chase implementing Menu
   - enter username (name)
   - exit (yes/no)
 1. First
-  - new game (yes/no)
+  - host new game (yes/no)
   - load game (yes/no)
+  - connect to game (ip address)
 2. Second
   - use unicode (yes/no)
 3. Third
