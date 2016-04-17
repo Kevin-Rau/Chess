@@ -648,6 +648,7 @@ class Save:
 	def save():
 		with open('game.txt', 'w') as outfile:
 			json.dump(Board.to_JSON(Board._board), outfile)
+			json.dump(Game._playerturn, outfile)
 		return True
 
 ###
