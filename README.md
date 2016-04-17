@@ -26,7 +26,7 @@ idea for connecting two players to a game:
 
 **Create a Save class:**
 
-Ryan2 implementing Save
+Ryan2 implementing Save **** COMPLETED ****
 
 1. First
   - detect user pressing "s" (save)
