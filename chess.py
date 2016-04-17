@@ -567,12 +567,12 @@ class Game:
 	def __init__(self):
 		self._playerturn = True
 	
-	def printPlayerTurn(self, menu):
+	def printPlayerTurn(self):
 		if(self._playerturn):
-			print(Back.WHITE + Fore.RESET + menu._playerName1 + " ->",end="")
+			print(Back.WHITE + Fore.RESET + "WHITE ->",end="")
 			print(Style.RESET_ALL + "")
 		else:
-			print(Back.BLACK + Fore.WHITE + menu._playerName2 + " ->",end="")
+			print(Back.BLACK + Fore.WHITE + "BLACK ->",end="")
 			print(Style.RESET_ALL + "")
 	
 	def switchPlayerTurn(self):
@@ -671,9 +671,6 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
 
-	def printOptions(self):
-		print("Enter \"q\" to quit or \"s\" to save")	
-
 	def quitRequested(self):
 		if self._quitRequested:
 			return True
@@ -698,8 +695,6 @@ class Menu:
 	_gameType = None
 	_username = ''
 	_unicode = None
-	
-	self._username = input('Enter Username: ')
 
 	def printTitle(self):
 		print("")
@@ -739,10 +734,10 @@ class Menu:
 		valid = False
 		while not valid:
 			unicode = input('Use Unicode Pieces? (y/n): ')
-			if unicode.lower() = 'y':
+			if unicode.lower() == 'y':
 				self._unicode = True
 				valid = True
-			elif unicode.lower() = 'n':
+			elif unicode.lower() == 'n':
 				self._unicode = False
 				valid = True
 		
@@ -813,8 +808,7 @@ def main():
 	while(battle):
 		
 		# player turn
-		game.printPlayerTurn(menu)
-		game.printOptions()
+		game.printPlayerTurn()
 		game.execPlayerTurn(chess)
 		if game.quitRequested():
 			print("")
