@@ -20,6 +20,7 @@ Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama 
 ### MODULES
 ###
 import json
+import socket
 import colorama
 from colorama import Fore, Back, Style
 
@@ -537,7 +538,6 @@ class Board:
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
 		self.setPiece(dest[0],dest[1],piece)
-		self._board[dest[0]][dest[1]] = piece
 		
 		return True
 
@@ -701,7 +701,47 @@ class Menu:
 		self._playerName1 = input('Player 1, Enter your name: ')
 		self._playerName2 = input('Player 2, Enter your name: ')
 		
+###
+### Connect
+###
+class Connect:
+	
+	# this is the host, sort of
+	_socket = None
+	_host = None
+	_port = None
+	
+	# this is the client, sort of
+	_connection = None
+	_addr = None
+	
+	# print(socket.gethostbyname(socket.gethostname()))
+	
+	def __init__(self):
+		self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self._host = socket.gethostname()
+		self._port = 8080
 
+	def hostGame(self):
+		self._host = socket.gethostname()
+		self._socket.bind((self._host, self._port))
+		self._socket.listen(1)
+
+	def connectToGame(self,address):
+		self._socket.connect((address, self._port))
+	
+	def waitForClient(self):
+		self._connection, self._addr = self._connection.accept()
+	
+	def receiveFromClient(self):
+		data = self._connection.recv(1024)	
+		
+	def sendToClient(self,output):
+		self._connection.sendall(output)
+	
+	def closeClient(self):
+		self._connection.close()
+	
 ###
 ### MAIN PROGRAM
 ###
@@ -743,4 +783,3 @@ def main():
 ###
 if __name__ == "__main__":
     main()
-
