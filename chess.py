@@ -564,7 +564,6 @@ class Game:
 	def chessToMatrix(self,boolean):
 		location = self._input
 		if location.lower() == 's':
-			print("SAVING GAME")
 			self._saveRequested = True
 		result = [None] * 2
 		if len(location) != 2:
