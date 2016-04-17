@@ -105,6 +105,8 @@ def King(orig,dest,board):
 def Queen(orig,dest,board):
 	squares = []
 
+	# orthogonal
+
 	# horizontal
 	if orig[0] == dest[0]:
 		x = orig[1]
@@ -153,9 +155,9 @@ def Queen(orig,dest,board):
 		else:
 			return False
 		
-	#diagonal
+	# diagonal
 
-		# left to right decrease (bi-directional)
+	# left to right decrease (bi-directional)
 	elif dest[0] - orig[0] == dest[1] - orig[1]:
 		x = orig[0]
 		y = orig[1]
@@ -219,7 +221,6 @@ def Queen(orig,dest,board):
 	
 	else:
 		return False
-	return False
 
 def Bishop(orig,dest,board):
 	squares = []
@@ -298,7 +299,6 @@ def Knight(orig,dest,board):
 		return True
 	else: 
 		return False
-	return False
 
 def Rook(orig,dest,board):
 	squares = []
