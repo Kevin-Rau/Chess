@@ -697,7 +697,9 @@ class Menu:
 
 	_gameType = None
 	_username = ''
-	_newGame = True
+	_unicode = None
+	
+	self._username = input('Enter Username: ')
 
 	def printTitle(self):
 		print("")
@@ -729,11 +731,20 @@ class Menu:
 			pass
 		elif self._gameType == 3:
 			sys.exit()
-			
-	
 
 	def askPlayerName(self):
-		self.username = input('Enter Username: ')
+		self._username = input('Enter Username: ')
+		
+	def askUnicode(self):
+		valid = False
+		while not valid:
+			unicode = input('Use Unicode Pieces? (y/n): ')
+			if unicode.lower() = 'y':
+				self._unicode = True
+				valid = True
+			elif unicode.lower() = 'n':
+				self._unicode = False
+				valid = True
 		
 ###
 ### Connect
@@ -794,6 +805,8 @@ def main():
 	
 	menu.printTitle()
 	menu.askPlayerName()
+	menu.askUnicode()
+	
 	chess.printBoard()
 	
 	# game logic goes here
