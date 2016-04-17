@@ -14,15 +14,19 @@ INSTRUCTIONS:
 
 Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama folder and run: python3 setup.py install
 
+Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into menu folder, and run: python3 setup.py install
+
 '''
 
 ###
 ### MODULES
 ###
+import sys
 import json
 import socket
 import colorama
 from colorama import Fore, Back, Style
+from cursesmenu import SelectionMenu
 
 ###
 ### HELPER FUNCTIONS
@@ -682,11 +686,11 @@ class Save:
 ###
 class Menu:			
 
-	_playerName1 = ''
-	_playerName2 = ''
+	_gameType = None
+	_username = ''
 	_newGame = True
 
-	def printTitle():
+	def printTitle(self):
 		print("")
 		print("      \u265F   L E T'S  P L A Y  \u2659")
 		print(" ____   _    _   ____    ___    ___ ")
@@ -697,9 +701,32 @@ class Menu:
 		print("\\____| |_|  |_| |____| \\____/ \\____/")
 		print("")
 
+	def gameMode(self):
+		game_list = ["Host A Game", "Load A Game", "Connect To A Game"]
+		menu = SelectionMenu(game_list, "Select an option")
+		menu.show()
+		menu.join()
+		self._gameType = menu.selected_option
+		
+	def runMode(self):
+		if self._gameType == 0:
+			print("Host A Game")
+			pass
+		elif self._gameType == 1:
+			print("Load A Game")
+			pass
+		elif self._gameType == 2:
+			print("Connect To A Game")
+			pass
+		elif self._gameType == 3:
+			sys.exit()
+			
+	
+
 	def askPlayerName(self):
-		self._playerName1 = input('Player 1, Enter your name: ')
-		self._playerName2 = input('Player 2, Enter your name: ')
+		self.username = input('Enter Username: ')
+		
+	
 		
 ###
 ### Connect
@@ -734,7 +761,7 @@ class Connect:
 		self._connection, self._addr = self._connection.accept()
 	
 	def receiveFromClient(self):
-		data = self._connection.recv(1024)	
+		return self._connection.recv(1024)
 		
 	def sendToClient(self,output):
 		self._connection.sendall(output)
@@ -751,11 +778,15 @@ def main():
 	chess = Board(False)
 	menu = Menu()
 	game = Game()
+	conn = Connect()
 	
 	battle = True
 	
-	Menu.printTitle()
-	Menu.askPlayerName(menu)
+	menu.gameMode()
+	menu.runMode()
+	
+	menu.printTitle()
+	menu.askPlayerName()
 	chess.printBoard()
 	
 	# game logic goes here
