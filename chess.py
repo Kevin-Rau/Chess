@@ -483,7 +483,6 @@ class Board:
 	
 	def printBoard(self):
 		rowGrid = ['1', '2', '3', '4', '5', '6', '7', '8']
-		
 		print("")
 		for piece in self._dead:
 			if piece.getColor():
@@ -664,6 +663,9 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
 
+	def printOptions(self):
+		print("Enter \"q\" to quit or \"s\" to save")	
+
 ###
 ### Save
 ###
@@ -697,6 +699,7 @@ def main():
 			return
 		# player turn
 		game.printPlayerTurn()
+		game.printOptions()
 		game.execPlayerTurn(chess)
 		
 		# result of turn
