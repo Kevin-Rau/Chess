@@ -485,6 +485,11 @@ class Board:
 		rowGrid = ['1', '2', '3', '4', '5', '6', '7', '8']
 		
 		print("")
+		for piece in self._dead:
+			if piece.getColor():
+				self.printPiece(piece)
+		print("")
+		print("")		
 		print("  A   B   C   D   E   F   G   H  ")
 		print("---------------------------------")
 		for i in range(8):
@@ -493,6 +498,10 @@ class Board:
 				self.printPiece(Board._board[i][j])
 			print("| " + rowGrid[i])
 			print("---------------------------------")
+		print("")
+		for piece in self._dead:
+			if not piece.getColor():
+				self.printPiece(piece)
 		print("")
 			
 	def getPiece(self,row,col):
