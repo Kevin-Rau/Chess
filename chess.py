@@ -560,12 +560,12 @@ class Game:
 	def __init__(self):
 		self._playerturn = True
 	
-	def printPlayerTurn(self):
+	def printPlayerTurn(self, menu):
 		if(self._playerturn):
-			print(Back.WHITE + Fore.RESET + "Player White ->",end="")
+			print(Back.WHITE + Fore.RESET + menu._playerName1 + " ->",end="")
 			print(Style.RESET_ALL + "")
 		else:
-			print(Back.BLACK + Fore.WHITE + "Player Black ->",end="")
+			print(Back.BLACK + Fore.WHITE + menu._playerName2 + " ->",end="")
 			print(Style.RESET_ALL + "")
 	
 	def switchPlayerTurn(self):
@@ -678,23 +678,51 @@ class Save:
 		return True
 
 ###
+### Menu
+###
+class Menu:			
+
+	_playerName1 = ''
+	_playerName2 = ''
+	_newGame = True
+
+	def printTitle():
+		print("")
+		print("      \u265F   L E T'S  P L A Y  \u2659")
+		print(" ____   _    _   ____    ___    ___ ")
+		print("/  __| | |  | | |  __|  /   \\  /   \\")
+		print("| |    | |__| | | |_    \\ \\_/  \\ \\_/")
+		print("| |    |  __  | |  _|   _\\ \\   _\\ \\ ")
+		print("| |__  | |  | | | |__  / \\\\ \\ / \\\\ \\")
+		print("\\____| |_|  |_| |____| \\____/ \\____/")
+		print("")
+
+	def askPlayerName(self):
+		self._playerName1 = input('Player 1, Enter your name: ')
+		self._playerName2 = input('Player 2, Enter your name: ')
+		
+
+###
 ### MAIN PROGRAM
 ###
 def main():
 	# start up procedure
 	print(Style.RESET_ALL + "",end="") # in case user uses non-white terminal
 	chess = Board(False)
+	menu = Menu()
 	game = Game()
 	
 	battle = True
 	
+	Menu.printTitle()
+	Menu.askPlayerName(menu)
 	chess.printBoard()
 	
 	# game logic goes here
 	while(battle):
 		
 		# player turn
-		game.printPlayerTurn()
+		game.printPlayerTurn(menu)
 		game.printOptions()
 		game.execPlayerTurn(chess)
 		if game._quitRequested:
