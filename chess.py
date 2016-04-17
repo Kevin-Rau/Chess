@@ -701,6 +701,24 @@ class Menu:
 		self._playerName1 = input('Player 1, Enter your name: ')
 		self._playerName2 = input('Player 2, Enter your name: ')
 		
+###
+### Connect
+###
+class Connect:
+	
+	_connection = None
+	_host = None
+	
+	s.bind((host, port))
+	s.listen(5)
+	
+	def __init__(self):
+		self._connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self._host = socket.gethostname()
+		
+		
+	def connect(self,address):
+		self._connection.connect((address, 8080))
 
 ###
 ### MAIN PROGRAM
