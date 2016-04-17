@@ -19,7 +19,7 @@ Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama 
 ###
 ### MODULES
 ###
-
+import json
 import colorama
 from colorama import Fore, Back, Style
 
@@ -532,6 +532,9 @@ class Board:
 		self._board[dest[0]][dest[1]] = piece
 		
 		return True
+
+	def to_JSON(self):
+		return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 	
 ###
 ### GAME
@@ -565,6 +568,8 @@ class Game:
 		location = self._input
 		if location.lower() == 's':
 			self._saveRequested = True
+			Save.save()
+
 		result = [None] * 2
 		if len(location) != 2:
 			return False
@@ -593,7 +598,8 @@ class Game:
 		while(not valid):
 			if self._saveRequested: 
 				self._input = input('* Game Saved *\nOrigin: ')
-			else:	
+				self._saveRequested = False
+			else:
 				self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
 			valid = self.chessToMatrix(True)
 			
@@ -604,6 +610,7 @@ class Game:
 		while(not valid):
 			if self._saveRequested:
 				self._input = input('* Game Saved *\nDestination: ')
+				self._saveRequested = False
 			else:
 				self._input = input('* Incorrect Input. Try Again. *\nDestination: ')	
 			valid = self.chessToMatrix(True)
@@ -625,8 +632,14 @@ class Game:
 ###
 ### Save
 ###
-		
+class Save:
 
+
+	#Save board state
+	def save():
+		with open('game.txt', 'w') as outfile:
+			json.dump(Board.to_JSON(Board._board), outfile)
+		return True
 
 ###
 ### MAIN PROGRAM
