@@ -733,14 +733,8 @@ class Menu:
 	
 
 	def askPlayerName(self):
-<<<<<<< HEAD
 		self.username = input('Enter Username: ')
 		
-	
-		
-=======
-				
->>>>>>> df2b2ba2da5b275073be7e1677ccfe7c3bb0b2fc
 ###
 ### Connect
 ###
