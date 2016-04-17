@@ -541,6 +541,9 @@ class Board:
 		
 		return True
 
+	def getBoard(self):
+		return self._board
+
 	def to_JSON(self):
 		return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 	
@@ -577,7 +580,6 @@ class Game:
 		location = self._input
 		if location.lower() == 's':
 			self._saveRequested = True
-			Save.save()
 
 		if location.lower() == 'q':
 			self._quitRequested = True	
@@ -604,11 +606,12 @@ class Game:
 			else:
 				return False
 
-	def askSquareOrigin(self):
+	def askSquareOrigin(self, board):
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
 		while(not valid):
 			if self._saveRequested: 
+				Save.save(board)
 				self._input = input('* Game Saved *\nOrigin: ')
 				self._saveRequested = False
 			elif self._quitRequested:
@@ -616,7 +619,7 @@ class Game:
 				if self._input == 'y':
 					self._input = input('Would you like to save? (y/n): ')
 					if self._input == 'y':
-						Save.save()
+						Save.save(board)
 					return
 				self._quitRequested = False	
 				self._input = input('Origin: ')		
@@ -625,11 +628,12 @@ class Game:
 			valid = self.chessToMatrix(True)
 			
 		
-	def askSquareDestination(self):
+	def askSquareDestination(self, board):
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
 		while(not valid):
 			if self._saveRequested:
+				Save.save(board)
 				self._input = input('* Game Saved *\nDestination: ')
 				self._saveRequested = False
 			elif self._quitRequested:
@@ -637,7 +641,7 @@ class Game:
 				if self._input == 'y':
 					self._input = input('Would you like to save? (y/n): ')
 					if self._input == 'y':
-						Save.save()
+						Save.save(board)
 					return
 				self._quitRequested = False	
 				self._input = input('Destination: ')		
@@ -654,10 +658,10 @@ class Game:
 	def execPlayerTurn(self,board):
 		valid = False
 		while(not valid):
-			self.askSquareOrigin()
+			self.askSquareOrigin(board)
 			if self._quitRequested:
 				 break
-			self.askSquareDestination()
+			self.askSquareDestination(board)
 			if self._quitRequested:
 				 break
 			valid = board.execute(self._playerturn,self._origin,self._destination)
@@ -676,9 +680,9 @@ class Game:
 ###
 class Save:
 	#Save board state
-	def save():
+	def save(board):
 		with open('game.json', 'w') as outfile:
-			json.dump(Board.to_JSON(Board._board), outfile)
+			json.dump(Board.to_JSON(board.getBoard()), outfile)
 			json.dump(Game._playerturn, outfile)
 		return True
 
