@@ -543,6 +543,7 @@ class Game:
 	_origin = [None] * 2
 	_destination = [None] * 2
 	_input = ''
+	_saveRequested = False
 	
 	def __init__(self):
 		self._playerturn = True
@@ -562,6 +563,9 @@ class Game:
 	# parameter "boolean": True = sets origin, False = sets destination
 	def chessToMatrix(self,boolean):
 		location = self._input
+		if location.lower() == 's':
+			print("SAVING GAME")
+			self._saveRequested = True
 		result = [None] * 2
 		if len(location) != 2:
 			return False
@@ -588,7 +592,10 @@ class Game:
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
 		while(not valid):
-			self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
+			if self._saveRequested: 
+				self._input = input('* Game Saved *\nOrigin: ')
+			else:	
+				self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
 			valid = self.chessToMatrix(True)
 			
 		
@@ -596,7 +603,10 @@ class Game:
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
 		while(not valid):
-			self._input = input('* Incorrect Input. Try Again. *\nDestination: ')
+			if self._saveRequested:
+				self._input = input('* Game Saved *\nDestination: ')
+			else:
+				self._input = input('* Incorrect Input. Try Again. *\nDestination: ')	
 			valid = self.chessToMatrix(True)
 		
 	def getOrigin(self):
@@ -612,7 +622,13 @@ class Game:
 			self.askSquareDestination()
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
-			
+
+###
+### Save
+###
+		
+
+
 ###
 ### MAIN PROGRAM
 ###
