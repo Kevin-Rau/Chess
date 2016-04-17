@@ -671,6 +671,9 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
 
+	def printOptions(self):
+		print("Enter \"q\" to quit or \"s\" to save")		
+
 	def quitRequested(self):
 		if self._quitRequested:
 			return True
@@ -684,7 +687,7 @@ class Save:
 	def save(board):
 		with open('game.json', 'w') as outfile:
 			json.dump(Board.to_JSON(board.getBoard()), outfile)
-			json.dump(Game._playerturn, outfile)
+			#json.dump(Game._playerturn, outfile)
 		return True
 
 ###
@@ -720,9 +723,13 @@ class Menu:
 			pass
 		elif self._gameType == 1:
 			print("Load A Game")
-			pass
+			json_data = open('game.json').read()
+			data = json.loads(json_data)
+			print(data)
 		elif self._gameType == 2:
 			print("Connect To A Game")
+			pass
+
 			pass
 		elif self._gameType == 3:
 			sys.exit()
@@ -809,6 +816,7 @@ def main():
 		
 		# player turn
 		game.printPlayerTurn()
+		game.printOptions()
 		game.execPlayerTurn(chess)
 		if game.quitRequested():
 			print("")
