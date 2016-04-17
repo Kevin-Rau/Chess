@@ -670,8 +670,6 @@ class Game:
 ### Save
 ###
 class Save:
-
-
 	#Save board state
 	def save():
 		with open('game.json', 'w') as outfile:
@@ -694,14 +692,14 @@ def main():
 	
 	# game logic goes here
 	while(battle):
-		if game._quitRequested:
-			print("Goodbye")
-			return
+		
 		# player turn
 		game.printPlayerTurn()
 		game.printOptions()
 		game.execPlayerTurn(chess)
-		
+		if game._quitRequested:
+			print("Goodbye")
+			return
 		# result of turn
 		chess.printBoard()
 
