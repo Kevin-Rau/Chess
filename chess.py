@@ -666,6 +666,11 @@ class Game:
 	def printOptions(self):
 		print("Enter \"q\" to quit or \"s\" to save")	
 
+	def quitRequested(self):
+		if self._quitRequested:
+			return True
+		return False	
+
 ###
 ### Save
 ###
@@ -700,7 +705,7 @@ class Menu:
 	def askPlayerName(self):
 		self._playerName1 = input('Player 1, Enter your name: ')
 		self._playerName2 = input('Player 2, Enter your name: ')
-		
+				
 ###
 ### Connect
 ###
@@ -765,7 +770,7 @@ def main():
 		game.printPlayerTurn(menu)
 		game.printOptions()
 		game.execPlayerTurn(chess)
-		if game._quitRequested:
+		if game.quitRequested():
 			print("")
 			print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
 			print("██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝ ")
