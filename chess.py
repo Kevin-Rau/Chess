@@ -429,6 +429,7 @@ class Board:
 	# board will store piece positions
 	_board = [[' ' for x in range(8)] for x in range(8)]
 	_dead = []
+	_active = True
 	
 	def __init__(self,unicode):
 		if unicode:
@@ -514,6 +515,25 @@ class Board:
 		
 	def setPiece(self,row,col,piece):
 		self._board[row][col] = piece
+		
+	def getGameStatus(self):
+		return self._active
+		
+	def setGameStatus(self,boolean):
+		self._active = False
+	
+	def killPiece(self,attacked,player):
+		if type(attacked) is not str:
+			if attacked.getColor() == player:
+				print("* You Cannot Attack Your Own Piece *")
+				return False
+			else:
+				self._dead.append(attacked)
+				attacked.setState(False)
+				if attacked.getID() == 'K' or attacked.getID() == '\u265A' or attacked.getID() == '\u2654':
+					self.setGameStatus(False)
+				return True
+		return True
 	
 	def execute(self,player,orig,dest):
 		# get origin piece
@@ -532,13 +552,8 @@ class Board:
 		
 		# kill the piece at destination if there was one there
 		attacked = self.getPiece(dest[0],dest[1])
-		if type(attacked) is not str:
-			if attacked.getColor() == player:
-				print("* You Cannot Attack Your Own Piece *")
-				return False
-			else:
-				self._dead.append(attacked)
-				attacked.setState(False)
+		if not self.killPiece(attacked,player):
+			return False
 		
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
@@ -654,12 +669,15 @@ class Game:
 		
 	def execPlayerTurn(self,board):
 		valid = False
-		while(not valid):
+		while not valid :
 			if not self.askSquareOrigin(board):
 				return False
 			if not self.askSquareDestination(board):
 				return False
 			valid = board.execute(self._playerturn,self._origin,self._destination)
+			if not board.getGameStatus():
+				self._command = 'l'
+				return False
 		self.switchPlayerTurn()
 		return True	
 
@@ -819,6 +837,9 @@ def main():
 					menu.printExit()
 					return
 				elif game.getCommand() == 'f':
+					menu.printGameOver()
+					time.sleep(3)
+				elif game.getCommand() == 'l':
 					menu.printGameOver()
 					time.sleep(3)
 				break
