@@ -21,6 +21,7 @@ Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into m
 ###
 ### MODULES
 ###
+import time
 import sys
 import json
 import socket
@@ -72,7 +73,7 @@ class Piece:
 		
 	def setState(self,state):
 		self._state = state
-		
+
 	def getState(self):
 		return self._state
 	
@@ -561,8 +562,7 @@ class Game:
 	_origin = [None] * 2
 	_destination = [None] * 2
 	_input = ''
-	_saveRequested = False
-	_quitRequested = False
+	_command = ''
 	
 	def __init__(self):
 		self._playerturn = True
@@ -582,12 +582,6 @@ class Game:
 	# parameter "boolean": True = sets origin, False = sets destination
 	def chessToMatrix(self,boolean):
 		location = self._input
-		if location.lower() == 's':
-			self._saveRequested = True
-
-		if location.lower() == 'q':
-			self._quitRequested = True	
-
 		result = [None] * 2
 		if len(location) != 2:
 			return False
@@ -610,48 +604,47 @@ class Game:
 			else:
 				return False
 
+	def readCommand(self):
+		command = self._input.lower()
+		if command == 's' or command == 'save':
+			print("Game Saved")
+			# run save command
+			self._command = 's'
+			return True
+		elif command == 'q' or command == 'quit':
+			self._command = 'q'
+			return False
+		elif command == 'f' or command == 'forfeit':
+			self._command = 'f'
+			return False
+		else:
+			return True
+
+	def getCommand(self):
+		return self._command
+	
+
 	def askSquareOrigin(self, board):
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
-		while(not valid):
-			if self._saveRequested: 
-				Save.save(board)
-				self._input = input('* Game Saved *\nOrigin: ')
-				self._saveRequested = False
-			elif self._quitRequested:
-				self._input = input('Do you really want to quit? (y/n): ')
-				if self._input == 'y':
-					self._input = input('Would you like to save? (y/n): ')
-					if self._input == 'y':
-						Save.save(board)
-					return
-				self._quitRequested = False	
-				self._input = input('Origin: ')		
+		while not valid:
+			if self.readCommand():
+				self._input = input('Origin: ')
 			else:
-				self._input = input('* Incorrect Input. Try Again. *\nOrigin: ')
+				return False
 			valid = self.chessToMatrix(True)
-			
+		return True
 		
 	def askSquareDestination(self, board):
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
-		while(not valid):
-			if self._saveRequested:
-				Save.save(board)
-				self._input = input('* Game Saved *\nDestination: ')
-				self._saveRequested = False
-			elif self._quitRequested:
-				self._input = input('Do you really want to quit? (y/n): ')
-				if self._input == 'y':
-					self._input = input('Would you like to save? (y/n): ')
-					if self._input == 'y':
-						Save.save(board)
-					return
-				self._quitRequested = False	
-				self._input = input('Destination: ')		
+		while not valid:
+			if self.readCommand():
+				self._input = input('Origin: ')
 			else:
-				self._input = input('* Incorrect Input. Try Again. *\nDestination: ')	
+				return False
 			valid = self.chessToMatrix(False)
+		return True
 		
 	def getOrigin(self):
 		return self._origin
@@ -662,22 +655,13 @@ class Game:
 	def execPlayerTurn(self,board):
 		valid = False
 		while(not valid):
-			self.askSquareOrigin(board)
-			if self._quitRequested:
-				 break
-			self.askSquareDestination(board)
-			if self._quitRequested:
-				 break
+			if not self.askSquareOrigin(board):
+				return False
+			if not self.askSquareDestination(board):
+				return False
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 		self.switchPlayerTurn()
-
-	def printOptions(self):
-		print("Enter \"q\" to quit or \"s\" to save")		
-
-	def quitRequested(self):
-		if self._quitRequested:
-			return True
-		return False	
+		return True	
 
 ###
 ### Save
@@ -719,7 +703,7 @@ class Menu:
 		
 	def runMode(self):
 		if self._gameType == 0:
-			print("Host A Game")
+			### host a game ###
 			pass
 		elif self._gameType == 1:
 			print("Load A Game")
@@ -727,7 +711,7 @@ class Menu:
 			data = json.loads(json_data)
 			print(data)
 		elif self._gameType == 2:
-			print("Connect To A Game")
+			### connect to a game ###
 			pass
 
 			pass
@@ -747,6 +731,19 @@ class Menu:
 			elif unicode.lower() == 'n':
 				self._unicode = False
 				valid = True
+				
+	def printGameOver(self):
+		print("game over... resetting in 3 seconds")			
+				
+	def printExit(self):
+		print("")
+		print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
+		print("██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝ ")
+		print("██║  ███╗██║   ██║██║   ██║██║  ██║██████╔╝ ╚████╔╝ █████╗   ")
+		print("██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝   ")
+		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
+		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
+		print("")
 		
 ###
 ### Connect
@@ -800,36 +797,34 @@ def main():
 	game = Game()
 	conn = Connect()
 	
-	battle = True
-	
-	menu.gameMode()
-	menu.runMode()
-	
-	menu.printTitle()
-	menu.askPlayerName()
-	menu.askUnicode()
-	
-	chess.printBoard()
-	
-	# game logic goes here
-	while(battle):
+	while True:
+		menu.gameMode()
+		menu.runMode()
 		
-		# player turn
-		game.printPlayerTurn()
-		game.printOptions()
-		game.execPlayerTurn(chess)
-		if game.quitRequested():
-			print("")
-			print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
-			print("██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝ ")
-			print("██║  ███╗██║   ██║██║   ██║██║  ██║██████╔╝ ╚████╔╝ █████╗   ")
-			print("██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝   ")
-			print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
-			print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
-			print("")
-			return
-		# result of turn
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
+		
 		chess.printBoard()
+		
+		# game logic goes here
+		while True:
+			
+			# player turn
+			game.printPlayerTurn()
+			
+			# run player turn, if returned false, get reason and act
+			if not game.execPlayerTurn(chess):
+				if game.getCommand() == 'q':
+					menu.printExit()
+					return
+				elif game.getCommand() == 'f':
+					menu.printGameOver()
+					time.sleep(3)
+				break
+				
+			# result of turn
+			chess.printBoard()
 
 ###
 ### EXECUTE PROGRAM HERE
