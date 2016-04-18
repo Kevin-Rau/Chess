@@ -24,6 +24,7 @@ Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into m
 import time
 import sys
 import json
+import csv
 import socket
 import colorama
 from colorama import Fore, Back, Style
@@ -49,7 +50,7 @@ class Piece:
 	# color = False black, True white
 	# state = False dead, True alive
 	_id = ''
-	_color = False 
+	_color = False
 	_state = False
 	_move = None
 	
@@ -431,50 +432,67 @@ class Board:
 	_dead = []
 	_active = True
 	
-	def __init__(self,unicode):
-		if unicode:
-			self._board[0][0] = Piece('\u265C',False,Rook)
-			self._board[0][1] = Piece('\u265E',False,Knight)
-			self._board[0][2] = Piece('\u265D',False,Bishop)
-			self._board[0][3] = Piece('\u265B',False,Queen)
-			self._board[0][4] = Piece('\u265A',False,King)
-			self._board[0][5] = Piece('\u265D',False,Bishop)
-			self._board[0][6] = Piece('\u265E',False,Knight)
-			self._board[0][7] = Piece('\u265C',False,Rook)
-			for i in range(8):
-				self._board[1][i] = Piece('\u265F',False,DownPawn)
-			for i in range(8):
-				self._board[6][i] = Piece('\u2659',True,UpPawn)
-			self._board[7][0] = Piece('\u2656',True,Rook)
-			self._board[7][1] = Piece('\u2658',True,Knight)
-			self._board[7][2] = Piece('\u2657',True,Bishop)
-			self._board[7][3] = Piece('\u2655',True,Queen)
-			self._board[7][4] = Piece('\u2654',True,King)
-			self._board[7][5] = Piece('\u2657',True,Bishop)
-			self._board[7][6] = Piece('\u2658',True,Knight)
-			self._board[7][7] = Piece('\u2656',True,Rook)
+	def __init__(self,option,gameType,loaddata):
+		
+		if gameType == 'loadgame':
+			z = 1
+			for x in range(8):
+				for y in range(8):
+					if option:
+						if loaddata[z] != 'empty':
+							self._board[x][y] = 'L' # Piece() unicode
+						else:
+							self._board[x][y] = ' '
+						z += 2
+					else:
+						if loaddata[z] != 'empty':
+							self._board[x][y] = 'L' # Piece() text
+						else:
+							self._board[x][y] = ' '
+						z += 2
 		else:
-			self._board[0][0] = Piece('R',False,Rook)
-			self._board[0][1] = Piece('N',False,Knight)
-			self._board[0][2] = Piece('B',False,Bishop)
-			self._board[0][3] = Piece('Q',False,Queen)
-			self._board[0][4] = Piece('K',False,King)
-			self._board[0][5] = Piece('B',False,Bishop)
-			self._board[0][6] = Piece('N',False,Knight)
-			self._board[0][7] = Piece('R',False,Rook)
-			for i in range(8):
-				self._board[1][i] = Piece('P',False,DownPawn)
-			for i in range(8):
-				self._board[6][i] = Piece('P',True,UpPawn)
-			self._board[7][0] = Piece('R',True,Rook)
-			self._board[7][1] = Piece('N',True,Knight)
-			self._board[7][2] = Piece('B',True,Bishop)
-			self._board[7][3] = Piece('Q',True,Queen)
-			self._board[7][4] = Piece('K',True,King)
-			self._board[7][5] = Piece('B',True,Bishop)
-			self._board[7][6] = Piece('N',True,Knight)
-			self._board[7][7] = Piece('R',True,Rook)
-
+			if option:
+				self._board[0][0] = Piece('\u265C',False,Rook)
+				self._board[0][1] = Piece('\u265E',False,Knight)
+				self._board[0][2] = Piece('\u265D',False,Bishop)
+				self._board[0][3] = Piece('\u265B',False,Queen)
+				self._board[0][4] = Piece('\u265A',False,King)
+				self._board[0][5] = Piece('\u265D',False,Bishop)
+				self._board[0][6] = Piece('\u265E',False,Knight)
+				self._board[0][7] = Piece('\u265C',False,Rook)
+				for i in range(8):
+					self._board[1][i] = Piece('\u265F',False,DownPawn)
+				for i in range(8):
+					self._board[6][i] = Piece('\u2659',True,UpPawn)
+				self._board[7][0] = Piece('\u2656',True,Rook)
+				self._board[7][1] = Piece('\u2658',True,Knight)
+				self._board[7][2] = Piece('\u2657',True,Bishop)
+				self._board[7][3] = Piece('\u2655',True,Queen)
+				self._board[7][4] = Piece('\u2654',True,King)
+				self._board[7][5] = Piece('\u2657',True,Bishop)
+				self._board[7][6] = Piece('\u2658',True,Knight)
+				self._board[7][7] = Piece('\u2656',True,Rook)
+			else:
+				self._board[0][0] = Piece('R',False,Rook)
+				self._board[0][1] = Piece('N',False,Knight)
+				self._board[0][2] = Piece('B',False,Bishop)
+				self._board[0][3] = Piece('Q',False,Queen)
+				self._board[0][4] = Piece('K',False,King)
+				self._board[0][5] = Piece('B',False,Bishop)
+				self._board[0][6] = Piece('N',False,Knight)
+				self._board[0][7] = Piece('R',False,Rook)
+				for i in range(8):
+					self._board[1][i] = Piece('P',False,DownPawn)
+				for i in range(8):
+					self._board[6][i] = Piece('P',True,UpPawn)
+				self._board[7][0] = Piece('R',True,Rook)
+				self._board[7][1] = Piece('N',True,Knight)
+				self._board[7][2] = Piece('B',True,Bishop)
+				self._board[7][3] = Piece('Q',True,Queen)
+				self._board[7][4] = Piece('K',True,King)
+				self._board[7][5] = Piece('B',True,Bishop)
+				self._board[7][6] = Piece('N',True,Knight)
+				self._board[7][7] = Piece('R',True,Rook)
 	
 	def printPiece(self,piece):
 		# string = blank square, object = piece
@@ -561,6 +579,18 @@ class Board:
 		
 		return True
 
+	def getBoardAsArray(self):
+		array = []
+		for row in self._board:
+			for col in row:
+				if type(col) is not str:
+					piece = col.getID() + "," + str(col.getColor()) + ","
+				else:
+					piece = 'empty,empty,'
+				array.append(piece)
+				
+		return array
+
 	def getBoard(self):
 		return self._board
 
@@ -581,6 +611,9 @@ class Game:
 	
 	def __init__(self):
 		self._playerturn = True
+	
+	def getPlayerTurn(self):
+		return self._playerturn
 	
 	def printPlayerTurn(self):
 		if(self._playerturn):
@@ -637,7 +670,6 @@ class Game:
 
 	def getCommand(self):
 		return self._command
-	
 
 	def askSquareOrigin(self, board):
 		self._input = input('Origin: ')
@@ -689,6 +721,7 @@ class Menu:
 	_gameType = None
 	_username = ''
 	_unicode = None
+	_loadfile = None
 
 	def printTitle(self):
 		print("")
@@ -711,19 +744,22 @@ class Menu:
 	def runMode(self):
 		if self._gameType == 0:
 			### host a game ###
-			pass
+			return 'hosting'
 		elif self._gameType == 1:
-			print("Load A Game")
-			json_data = open('game.json').read()
-			data = json.loads(json_data)
-			print(data)
+			array = []
+			reader = csv.reader(open('chessGame.txt', 'r'), delimiter=',')
+			for x in reader:
+				array.append(x)
+			self._loadfile = array[0]
+			return 'loading'
 		elif self._gameType == 2:
 			### connect to a game ###
-			pass
-
-			pass
+			return 'connecting'
 		elif self._gameType == 3:
 			sys.exit()
+
+	def getFileData(self):
+		return self._loadfile
 
 	def askPlayerName(self):
 		self._username = input('Enter Username: ')
@@ -754,10 +790,16 @@ class Menu:
 	def printGameOver(self):
 		print("\ngame over... resetting in 3 seconds")
 
-	def save(self, board):
+	def saveGame(self,game,board):
+		with open('chessGame.txt', 'w+') as f:
+			f.write(str(game.getPlayerTurn()) + ",")
+			for x in board.getBoardAsArray():
+				f.write(x)
+
+	def save(self,board):
 		with open('game.json', 'w') as outfile:
-			json.dump(Board.to_JSON(board.getBoard()), outfile)
-			#json.dump(Game._playerturn, outfile)			
+			json.dump(board.getBoardAsArray(), outfile)
+			#json.dump(Game._playerturn, outfile)	
 				
 	def printExit(self):
 		print("")
@@ -816,19 +858,30 @@ class Connect:
 def main():
 	# start up procedure
 	print(Style.RESET_ALL + "",end="") # in case user uses non-white terminal
-	chess = Board(False)
 	menu = Menu()
-	game = Game()
 	conn = Connect()
 	
 	while True:
+		# determine game mode & load correctly
 		menu.gameMode()
-		menu.runMode()
-		
+		mode = menu.runMode()
 		menu.printTitle()
 		menu.askPlayerName()
-		menu.askUnicode()
+		unicodeOption = menu.askUnicode()
 		menu.printOptions()
+		
+		if mode == 'loading':
+			chess = Board(unicodeOption,'loadgame',menu.getFileData())
+			game = Game()
+		elif mode == 'hosting':
+			chess = Board(unicodeOption,'newgame',None)
+			game = Game()
+		elif mode == 'connecting':
+			chess = Board(unicodeOption,'newgame',None)
+			game = Game()
+		else:
+			# you should never get here
+			sys.exit()
 		
 		chess.printBoard()
 		
@@ -844,7 +897,7 @@ def main():
 					menu.printExit()
 					return
 				elif game.getCommand() == 's':
-					menu.save(chess)
+					menu.saveGame(game,chess)
 					continue	
 				elif game.getCommand() == 'f':
 					menu.printGameOver()
