@@ -41,6 +41,10 @@ def checkEmpty(squares,board):
 			return False
 	return True
 
+# id -> unicode
+unicode_to_id = {'\u2659':'UpPawn','\u265F':'DownPawn','\u265C':'Rook','\u2656':'Rook','\u265E':'Knight','\u2658':'Knight','\u265D':'Bishop','\u2657':'Bishop','\u265B':'Queen','\u2655':'Queen','\u265A':'King','\u2654':'King'}
+id_to_piece = {'p':'UpPawn','P':'DownPawn','R':'Rook','N':'Knight','B':'Bishop','Q':'Queen','K':'King'}
+
 ###
 ### PIECE
 ###
@@ -446,7 +450,7 @@ class Board:
 						z += 2
 					else:
 						if loaddata[z] != 'empty':
-							self._board[x][y] = 'L' # Piece() text
+							self._board[x][y] = Piece(loaddata[z],'True' == loaddata[z+1],id_to_piece[loaddata[z]])
 						else:
 							self._board[x][y] = ' '
 						z += 2
@@ -484,7 +488,7 @@ class Board:
 				for i in range(8):
 					self._board[1][i] = Piece('P',False,DownPawn)
 				for i in range(8):
-					self._board[6][i] = Piece('P',True,UpPawn)
+					self._board[6][i] = Piece('p',True,UpPawn)
 				self._board[7][0] = Piece('R',True,Rook)
 				self._board[7][1] = Piece('N',True,Knight)
 				self._board[7][2] = Piece('B',True,Bishop)
@@ -798,11 +802,6 @@ class Menu:
 			f.write(str(game.getPlayerTurn()) + ",")
 			for x in board.getBoardAsArray():
 				f.write(x)
-
-	def save(self,board):
-		with open('game.json', 'w') as outfile:
-			json.dump(board.getBoardAsArray(), outfile)
-			#json.dump(Game._playerturn, outfile)	
 				
 	def printExit(self):
 		print("")
