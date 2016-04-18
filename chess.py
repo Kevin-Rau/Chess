@@ -625,7 +625,7 @@ class Game:
 			print("Game Saved")
 			# run save command
 			self._command = 's'
-			return True
+			return False
 		elif command == 'q' or command == 'quit':
 			self._command = 'q'
 			return False
@@ -680,17 +680,6 @@ class Game:
 				return False
 		self.switchPlayerTurn()
 		return True	
-
-###
-### Save
-###
-class Save:
-	#Save board state
-	def save(board):
-		with open('game.json', 'w') as outfile:
-			json.dump(Board.to_JSON(board.getBoard()), outfile)
-			#json.dump(Game._playerturn, outfile)
-		return True
 
 ###
 ### Menu
@@ -763,7 +752,12 @@ class Menu:
 		input('')
 		
 	def printGameOver(self):
-		print("\ngame over... resetting in 3 seconds")			
+		print("\ngame over... resetting in 3 seconds")
+
+	def save(self, board):
+		with open('game.json', 'w') as outfile:
+			json.dump(Board.to_JSON(board.getBoard()), outfile)
+			#json.dump(Game._playerturn, outfile)			
 				
 	def printExit(self):
 		print("")
@@ -849,6 +843,9 @@ def main():
 				if game.getCommand() == 'q':
 					menu.printExit()
 					return
+				elif game.getCommand() == 's':
+					menu.save(chess)
+					continue	
 				elif game.getCommand() == 'f':
 					menu.printGameOver()
 					time.sleep(3)
