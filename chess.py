@@ -749,9 +749,21 @@ class Menu:
 			elif unicode.lower() == 'n':
 				self._unicode = False
 				valid = True
-				
+	
+	def printOptions(self):
+		print("")
+		print("----------------------------------------------------")
+		print("Options:")
+		print("s or save - saves the game for later")
+		print("q or quit - quits and exits the program")
+		print("f or forfeit - forfeit the game and return to menu")
+		print("----------------------------------------------------")
+		print("Press Any Key To Continue")
+		print("")
+		input('')
+		
 	def printGameOver(self):
-		print("game over... resetting in 3 seconds")			
+		print("\ngame over... resetting in 3 seconds")			
 				
 	def printExit(self):
 		print("")
@@ -822,6 +834,7 @@ def main():
 		menu.printTitle()
 		menu.askPlayerName()
 		menu.askUnicode()
+		menu.printOptions()
 		
 		chess.printBoard()
 		
