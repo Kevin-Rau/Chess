@@ -7,8 +7,8 @@ An object oriented javascript chess game
 
 **Implement Connection Logic**
 
-** Clock Class**
+**Clock Class**
 
-** Stats Class**
+**Stats Class**
 
 
