@@ -41,9 +41,15 @@ def checkEmpty(squares,board):
 			return False
 	return True
 
-# id -> unicode
-unicode_to_id = {'\u2659':'UpPawn','\u265F':'DownPawn','\u265C':'Rook','\u2656':'Rook','\u265E':'Knight','\u2658':'Knight','\u265D':'Bishop','\u2657':'Bishop','\u265B':'Queen','\u2655':'Queen','\u265A':'King','\u2654':'King'}
+###
+### PIECE TRANSLATION DICTIONARIES
+###
+
+unicode_to_piece = {'\u2659':'UpPawn','\u265F':'DownPawn','\u265C':'Rook','\u2656':'Rook','\u265E':'Knight','\u2658':'Knight','\u265D':'Bishop','\u2657':'Bishop','\u265B':'Queen','\u2655':'Queen','\u265A':'King','\u2654':'King'}
+unicode_to_id = {'\u2659':'p','\u265F':'P','\u265C':'R','\u2656':'R','\u265E':'N','\u2658':'N','\u265D':'B','\u2657':'B','\u265B':'Q','\u2655':'Q','\u265A':'K','\u2654':'K'}
 id_to_piece = {'p':'UpPawn','P':'DownPawn','R':'Rook','N':'Knight','B':'Bishop','Q':'Queen','K':'King'}
+id_to_blackUnicode = {'P':'\u265F','R':'\u265C','N':'\u265E','B':'\u265D','Q':'\u265B','K':'\u265A'}
+id_to_whiteUnicode = {'p':'\u2659','R':'\u2656','N':'\u2658','B':'\u2657','Q':'\u2655','K':'\u2654'}
 
 ###
 ### PIECE
@@ -444,7 +450,10 @@ class Board:
 				for y in range(8):
 					if option:
 						if loaddata[z] != 'empty':
-							self._board[x][y] = 'L' # Piece() unicode
+							if loaddata[z+1] == 'True':
+								self._board[x][y] = Piece(id_to_whiteUnicode[loaddata[z]],True,id_to_piece[loaddata[z]])
+							else:
+								self._board[x][y] = Piece(id_to_blackUnicode[loaddata[z]],False,id_to_piece[loaddata[z]])
 						else:
 							self._board[x][y] = ' '
 						z += 2
@@ -588,7 +597,7 @@ class Board:
 		for row in self._board:
 			for col in row:
 				if type(col) is not str:
-					piece = col.getID() + "," + str(col.getColor()) + ","
+					piece = unicode_to_id[col.getID()] + "," + str(col.getColor()) + ","
 				else:
 					piece = 'empty,empty,'
 				array.append(piece)
@@ -597,9 +606,6 @@ class Board:
 
 	def getBoard(self):
 		return self._board
-
-	def to_JSON(self):
-		return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 	
 ###
 ### GAME
@@ -613,8 +619,8 @@ class Game:
 	_input = ''
 	_command = ''
 	
-	def __init__(self):
-		self._playerturn = True
+	def __init__(self,player = True):
+		self._playerturn = player
 	
 	def getPlayerTurn(self):
 		return self._playerturn
@@ -874,7 +880,10 @@ def main():
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
-			game = Game()
+			if menu.getFileData()[0] == 'True':
+				game = Game(True)
+			else:
+				game = Game(False)
 		elif mode == 'hosting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
