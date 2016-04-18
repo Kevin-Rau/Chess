@@ -774,6 +774,9 @@ class Menu:
 			elif unicode.lower() == 'n':
 				self._unicode = False
 				valid = True
+
+	def getUnicode(self):
+		return self._unicode
 	
 	def printOptions(self):
 		print("")
@@ -867,17 +870,17 @@ def main():
 		mode = menu.runMode()
 		menu.printTitle()
 		menu.askPlayerName()
-		unicodeOption = menu.askUnicode()
+		menu.askUnicode()
 		menu.printOptions()
 		
 		if mode == 'loading':
-			chess = Board(unicodeOption,'loadgame',menu.getFileData())
+			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
 			game = Game()
 		elif mode == 'hosting':
-			chess = Board(unicodeOption,'newgame',None)
+			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
 		elif mode == 'connecting':
-			chess = Board(unicodeOption,'newgame',None)
+			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
 		else:
 			# you should never get here
