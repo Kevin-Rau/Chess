@@ -597,7 +597,10 @@ class Board:
 		for row in self._board:
 			for col in row:
 				if type(col) is not str:
-					piece = unicode_to_id[col.getID()] + "," + str(col.getColor()) + ","
+					if len(col.getID()) != 1:
+						piece = unicode_to_id[col.getID()] + "," + str(col.getColor()) + ","
+					else:
+						piece = col.getID() + "," + str(col.getColor()) + ","
 				else:
 					piece = 'empty,empty,'
 				array.append(piece)
@@ -844,6 +847,9 @@ class Connect:
 		self._host = socket.gethostname()
 		self._socket.bind((self._host, self._port))
 		self._socket.listen(1)
+		
+	def printHostName(self):
+		print(self._host)
 
 	def connectToGame(self,address):
 		self._socket.connect((address, self._port))
@@ -887,9 +893,15 @@ def main():
 		elif mode == 'hosting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
+			conn.hostGame()
+			conn.printHostName()
+			conn.waitForClient()
+			input("Waiting...")
 		elif mode == 'connecting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
+			address = input("Enter The Host's Address: ")
+			conn.connectToGame(address)
 		else:
 			# you should never get here
 			sys.exit()
