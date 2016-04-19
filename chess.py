@@ -855,15 +855,17 @@ class Connect:
 		self._socket.connect((address, self._port))
 	
 	def waitForClient(self):
-		self._connection, self._addr = self._connection.accept()
+		self._connection, self._addr = self._socket.accept()
+		print("Got connection from : " + self._connection) # test
+		self.connection.send("Your Connected !!!!!") # test
 	
-	def receiveFromClient(self):
+	def receive(self):
 		return self._connection.recv(1024)
 		
-	def sendToClient(self,output):
+	def send(self,output):
 		self._connection.sendall(output)
 	
-	def closeClient(self):
+	def close(self):
 		self._connection.close()
 	
 ###
@@ -902,6 +904,8 @@ def main():
 			game = Game()
 			address = input("Enter The Host's Address: ")
 			conn.connectToGame(address)
+			hi = conn.receive() # test
+			print(hi)
 		else:
 			# you should never get here
 			sys.exit()
