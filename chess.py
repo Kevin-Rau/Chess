@@ -621,6 +621,7 @@ class Game:
 	_destination = [None] * 2
 	_input = ''
 	_command = ''
+	_winner = None
 	
 	def __init__(self,player = True):
 		self._playerturn = player
@@ -722,9 +723,13 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 			if not board.getGameStatus():
 				self._command = 'l'
+				self._winner = self._playerturn
 				return False
 		self.switchPlayerTurn()
 		return True	
+
+	def getWinner(self):
+		return 'white' if self._winner else 'black'
 
 ###
 ### Menu
@@ -748,7 +753,7 @@ class Menu:
 		print("")
 
 	def gameMode(self):
-		game_list = ["Host A Game", "Load A Game", "Connect To A Game"]
+		game_list = ["Host A Game", "Load A Game", "Connect To A Game", "Dispay Stats"]
 		menu = SelectionMenu(game_list, "CHESS")
 		menu.show()
 		menu.join()
@@ -769,6 +774,9 @@ class Menu:
 			### connect to a game ###
 			return 'connecting'
 		elif self._gameType == 3:
+			print("we are all winners here!")
+			sys.exit()
+		elif self._gameType == 4:
 			sys.exit()
 
 	def getFileData(self):
@@ -895,10 +903,10 @@ def main():
 		elif mode == 'hosting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
-			conn.hostGame()
-			conn.printHostName()
-			conn.waitForClient()
-			input("Waiting...")
+			#conn.hostGame()
+			#conn.printHostName()
+			#conn.waitForClient()
+			#input("Waiting...")
 		elif mode == 'connecting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
@@ -930,6 +938,7 @@ def main():
 					menu.printGameOver()
 					time.sleep(3)
 				elif game.getCommand() == 'l':
+					print("The winner is: " + game.getWinner())
 					menu.printGameOver()
 					time.sleep(3)
 				break
