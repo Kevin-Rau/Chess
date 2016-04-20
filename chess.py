@@ -782,6 +782,7 @@ class Menu:
 	_host = False
 	_gameType = None
 	_username = ''
+	_opponentname = ''
 	_unicode = None
 	_loadfile = None
 	_statsfile = None
@@ -839,6 +840,12 @@ class Menu:
 		
 	def getUsername(self):
 		return self._username
+		
+	def setOpponentName(self,name):
+		self._opponentname = name
+		
+	def getOpponentName(self):
+		return self._opponentname
 	
 	def getHost(self):
 		return self._host
@@ -1044,7 +1051,19 @@ def main():
 		else:
 			# you should never get here
 			sys.exit()
-
+		
+		# exchange user names here
+		if menu.getHost():
+			message = conn.receiveFromClient()
+			menu.setOpponentName(message)
+			time.sleep(0.2)
+			conn.sendToClient(menu.getUsername())
+		else:
+			time.sleep(0.2)
+			conn.sendToHost(menu.getUsername())
+			message = conn.receiveFromHost()
+			menu.setOpponentName(message)
+		
 		menu.printOptions()
 		
 		# game logic goes here
