@@ -194,8 +194,6 @@ def Queen(orig,dest,board):
 			x = x + incr
 			y = y + incr
 		
-		print(squares)
-		
 		# check squares
 		valid = checkEmpty(squares,board)
 		if valid:
@@ -208,8 +206,6 @@ def Queen(orig,dest,board):
 		x = orig[0]
 		y = orig[1]
 		z = dest[0]
-		
-		print("hi!")
 		
 		# grab direction
 		if z > x:
@@ -226,8 +222,6 @@ def Queen(orig,dest,board):
 			squares.append((x,y))
 			x = x + row
 			y = y + col
-		
-		print(squares)
 		
 		# check squares
 		valid = checkEmpty(squares,board)
@@ -261,9 +255,7 @@ def Bishop(orig,dest,board):
 			squares.append((x,y))
 			x = x + incr
 			y = y + incr
-		
-		print(squares)
-		
+
 		# check squares
 		valid = checkEmpty(squares,board)
 		if valid:
@@ -276,8 +268,6 @@ def Bishop(orig,dest,board):
 		x = orig[0]
 		y = orig[1]
 		z = dest[0]
-		
-		print("hi!")
 		
 		# grab direction
 		if z > x:
@@ -294,8 +284,6 @@ def Bishop(orig,dest,board):
 			squares.append((x,y))
 			x = x + row
 			y = y + col
-		
-		print(squares)
 		
 		# check squares
 		valid = checkEmpty(squares,board)
@@ -475,6 +463,9 @@ class Board:
 				self._board[0][7] = Piece('\u265C',False,Rook)
 				for i in range(8):
 					self._board[1][i] = Piece('\u265F',False,DownPawn)
+				for x in range(2,6):
+					for y in range(8):
+						self._board[x][y] = ' '
 				for i in range(8):
 					self._board[6][i] = Piece('\u2659',True,UpPawn)
 				self._board[7][0] = Piece('\u2656',True,Rook)
@@ -496,6 +487,9 @@ class Board:
 				self._board[0][7] = Piece('R',False,Rook)
 				for i in range(8):
 					self._board[1][i] = Piece('P',False,DownPawn)
+				for x in range(2,6):
+					for y in range(8):
+						self._board[x][y] = ' '
 				for i in range(8):
 					self._board[6][i] = Piece('p',True,UpPawn)
 				self._board[7][0] = Piece('R',True,Rook)
@@ -617,6 +611,10 @@ class Game:
 	
 	# playerturn False black, True white
 	_playerturn = True
+	
+	# this player's color
+	_thisPlayer = None
+	
 	_origin = [None] * 2
 	_destination = [None] * 2
 	_input = ''
@@ -624,8 +622,12 @@ class Game:
 	_winner = None
 	_loser = None
 	
-	def __init__(self,player = True):
+	def __init__(self,currentPlayer,player = True):
+		self._thisPlayer = currentPlayer
 		self._playerturn = player
+	
+	def getThisPlayerColor(self):
+		return self._thisPlayer
 	
 	def getPlayerTurn(self):
 		return self._playerturn
@@ -667,6 +669,17 @@ class Game:
 			else:
 				return False
 
+	def movesToChess(self):
+		letter = {0:"a",1:"b",2:"c",3:"d",4:"e",5:"f",6:"g",7:"h"}
+		number = {0:"1",1:"2",2:"3",3:"4",4:"5",5:"6",6:"7",7:"8"}
+		moves = ''
+		moves += letter[self._origin[1]]
+		moves += number[self._origin[0]]
+		moves += ","
+		moves += letter[self._destination[1]]
+		moves += number[self._destination[0]]
+		return moves
+
 	def readCommand(self):
 		command = self._input.lower()
 		if command == 's' or command == 'save':
@@ -686,6 +699,7 @@ class Game:
 	def getCommand(self):
 		return self._command
 
+	# returns False if command is found, command stored in _command by readCommnand()
 	def askSquareOrigin(self, board):
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
@@ -697,6 +711,7 @@ class Game:
 			valid = self.chessToMatrix(True)
 		return True
 		
+	# returns False if command is found, command stored in _command by readCommnand()
 	def askSquareDestination(self, board):
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
@@ -713,8 +728,9 @@ class Game:
 
 	def getDestination(self):
 		return self._destination
-		
-	def execPlayerTurn(self,board):
+	
+	# returns False if command was input or game is over
+	def execCurrentPlayerTurn(self,board):
 		valid = False
 		while not valid :
 			if not self.askSquareOrigin(board):
@@ -723,12 +739,35 @@ class Game:
 				return False
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 			if not board.getGameStatus():
-				self._command = 'l'
+				self._command = 'w'
 				self._winner = self._playerturn
+<<<<<<< HEAD
 				self._loser = not self._playerturn
-				return False
+>>>>>>> eb061adeb4e6c8106081943526b2529784bf9493
 		self.switchPlayerTurn()
-		return True	
+		return True
+		
+	def execOpponentPlayerTurn(self,board,origin,destination):
+		self._input = origin
+		self.chessToMatrix(True)
+		self._input = destination
+		self.chessToMatrix(False)
+		board.execute(self._playerturn,self._origin,self._destination)
+		if not board.getGameStatus():
+			self._command = 'l'
+		self.switchPlayerTurn()
+		return True
+	
+	def execOpponentCommand(self,board,command):
+		if command == 'w':
+			self._command = "l" # loss
+		elif command == 'f':
+			self._command = 'v' # victory
+		elif command == 'q':
+			self._command = 'v' # victory
+		else:
+			print("Uh... got opponent command I don't know. Most likely a connection error.")
+	
 
 	def getWinner(self):
 		return 'white' if self._winner else 'black'
@@ -742,6 +781,7 @@ class Game:
 ###
 class Menu:			
 
+	_host = False
 	_gameType = None
 	_username = ''
 	_unicode = None
@@ -760,7 +800,7 @@ class Menu:
 		print("")
 
 	def gameMode(self):
-		game_list = ["Host A Game", "Load A Game", "Connect To A Game", "Dispay Stats"]
+		game_list = ["Host A New Game", "Load & Host A Game", "Connect To A Game", "Dispay Stats"]
 		menu = SelectionMenu(game_list, "CHESS")
 		menu.show()
 		menu.join()
@@ -799,6 +839,15 @@ class Menu:
 	def askPlayerName(self):
 		self._username = input('Enter Username: ')
 		
+	def getUsername(self):
+		return self._username
+	
+	def getHost(self):
+		return self._host
+		
+	def setHost(self):
+		self._host = True
+	
 	def askUnicode(self):
 		valid = False
 		while not valid:
@@ -824,15 +873,34 @@ class Menu:
 		print("Press Any Key To Continue")
 		print("")
 		input('')
-		
-	def printGameOver(self):
-		print("\ngame over... resetting in 3 seconds")
 
 	def saveGame(self,game,board):
 		with open('chessGame.txt', 'w+') as f:
 			f.write(str(game.getPlayerTurn()) + ",")
 			for x in board.getBoardAsArray():
 				f.write(x)
+	
+	def printLoss(self):
+		print("\nYou Lost.")
+		
+	def printWin(self):
+		print("\nYou Won!")
+		
+	def printForfeit(self):
+		print("\nYou Forfeited. Game resetting in 3 seconds...")
+		
+	def printVictory(self):
+		print("\nYour Opponent Forfeited. You Win!!")
+
+	def printQuit(self):
+		print("")
+		print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
+		print("██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝ ")
+		print("██║  ███╗██║   ██║██║   ██║██║  ██║██████╔╝ ╚████╔╝ █████╗   ")
+		print("██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝   ")
+		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
+		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
+		print("")
 
 	def storeStats(self, game):
 		with open('stats.txt', 'a') as f:
@@ -856,6 +924,7 @@ class Menu:
 			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
 			i += 2
 		print("")
+<<<<<<< HEAD
 		exit = input('Press any key to return to the main menu: ')
 		return
 
@@ -870,6 +939,8 @@ class Menu:
 		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
 		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
 		print("")
+=======
+>>>>>>> eefea105144cb8206970440e549e7fab266412ed
 		
 ###
 ### Connect
@@ -894,28 +965,55 @@ class Connect:
 
 	def hostGame(self):
 		self._host = socket.gethostname()
+		self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self._socket.bind((self._host, self._port))
 		self._socket.listen(1)
 		
 	def printHostName(self):
-		print(self._host)
+		print(Back.WHITE + Fore.BLACK + "\nTell Player 2 To Connect To This Address:")
+		print(Back.BLUE + Style.BRIGHT + Fore.WHITE + self._host)
+		print(Style.RESET_ALL + "",end="")
+
+	def waitForClient(self):
+		print("\nWaiting for connection...")
+		self._connection, self._addr = self._socket.accept() # blocking, waits for connection
 
 	def connectToGame(self,address):
 		self._socket.connect((address, self._port))
 	
-	def waitForClient(self):
-		self._connection, self._addr = self._socket.accept()
-		print("Got connection from : " + self._connection) # test
-		self.connection.send("Your Connected !!!!!") # test
-	
-	def receive(self):
-		return self._connection.recv(1024)
+	# client calls this
+	def receiveFromHost(self):
+		message = self._socket.recv(1024) # blocking, waits for connection
+		return message.decode("utf-8")
 		
-	def send(self,output):
-		self._connection.sendall(output)
+	# host calls this
+	def receiveFromClient(self):
+		message = self._connection.recv(1024) # blocking, waits for connection
+		return message.decode("utf-8")
+		
+	# client calls this
+	def sendToHost(self,output):
+		self._socket.send(str.encode(output))	
+		
+	# host calls this
+	def sendToClient(self,output):
+		self._connection.send(str.encode(output))
 	
-	def close(self):
+	# client closes their connection
+	def clientCloseConnection(self):
+		self._socket.close()
+
+	# host closes client connection
+	def hostCloseConnection(self):
 		self._connection.close()
+		self._socket.close()
+		self._socket = None
+		
+	# reset the connection after a game ends
+	def resetConnection(self):
+		self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self._host = socket.gethostname()
+		self._port = 8080
 	
 ###
 ### MAIN PROGRAM
@@ -926,32 +1024,37 @@ def main():
 	menu = Menu()
 	conn = Connect()
 	
-	while True:
+	war = True # program flag
+	while war:
 		# determine game mode & load correctly
 		menu.gameMode()
 		mode = menu.runMode()
-		
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
 			if menu.getFileData()[0] == 'True':
-				game = Game(True)
+				game = Game(True,True)
 			else:
-				game = Game(False)
-		elif mode == 'hosting':
-			chess = Board(menu.getUnicode(),'newgame',None)
-			game = Game()
+				game = Game(True,False)
+			menu.setHost()
 			conn.hostGame()
 			conn.printHostName()
 			conn.waitForClient()
-			input("Waiting...")
+		elif mode == 'hosting':
+			chess = Board(menu.getUnicode(),'newgame',None)
+			game = Game(True)
+			menu.setHost()
+			conn.hostGame()
+			conn.printHostName()
+			conn.waitForClient()
 		elif mode == 'connecting':
 			chess = Board(menu.getUnicode(),'newgame',None)
-			game = Game()
-			address = input("Enter The Host's Address: ")
+			game = Game(False)
+			address = input("\nEnter The Host's Address: ")
 			conn.connectToGame(address)
-			hi = conn.receive() # test
-			print(hi)
 		elif mode == 'displaying':
 			menu.displayStatsBoard()	
 			continue
@@ -959,38 +1062,104 @@ def main():
 			# you should never get here
 			sys.exit()
 
-		menu.printTitle()
-		menu.askPlayerName()
-		menu.askUnicode()
 		menu.printOptions()
 		chess.printBoard()
 		
 		# game logic goes here
-		while True:
+		battle = True # game flag
+		while battle:
 			
 			# player turn
 			game.printPlayerTurn()
 			
-			# run player turn, if returned false, get reason and act
-			if not game.execPlayerTurn(chess):
-				if game.getCommand() == 'q':
-					menu.printExit()
-					return
-				elif game.getCommand() == 's':
-					menu.saveGame(game,chess)
-					continue	
-				elif game.getCommand() == 'f':
-					menu.printGameOver()
-					time.sleep(3)
-				elif game.getCommand() == 'l':
-					print("The winner is: " + game.getWinner())
-					menu.storeStats(game)
-					menu.printGameOver()
-					time.sleep(3)
-				break
+<<<<<<< HEAD
+			# current player turn
+			if game.getThisPlayerColor() == game.getPlayerTurn():
+			
+				# if False returned, process command
+				if not game.execCurrentPlayerTurn(chess):
+					if game.getCommand() == 'q':
+						message = game.getCommand()
+						menu.printQuit()
+						battle = False
+						war = False
+					elif game.getCommand() == 's':
+						menu.saveGame(game,chess)
+						# continue will skip everything and return to input prompt
+						continue
+					elif game.getCommand() == 'f':
+						message = game.getCommand()
+						menu.printForfeit()
+						time.sleep(3)
+						battle = False
+				else:
+				
+					# send the player's move to the opponent
+					message = game.movesToChess()
+					
+				if menu.getHost():
+					conn.sendToClient(message)
+				else:
+					conn.sendToHost(message)
+					
+				# check if the game is over
+				if game.getCommand() == 'w':
+					chess.printBoard()
+					menu.printWin()
+					input("\nPress Any Key To Continue")
+					battle = False
+
+			# wait for opponent
+			else:
+				
+				print("Waiting for opponent to move...")
+				
+				# wait for opponent player, then get their turn
+				if menu.getHost():
+					message = conn.receiveFromClient()
+				else:
+					message = conn.receiveFromHost()
+
+				moves = message.split(",")
+				if len(moves) > 1:
+					# print opponent's move
+					print(message)
+					
+					origin = moves[0]
+					destination = moves[1]
+					
+					# run the opponent's player turn
+					game.execOpponentPlayerTurn(chess,origin,destination)
+					
+					# check if the game is over
+					if game.getCommand() == 'l':
+						chess.printBoard()
+						menu.printLoss()
+						input("\nPress Any Key To Continue")
+						battle = False
+				else:
+					command = moves[0]
+					game.execOpponentCommand(chess,command) ### need to update chess board if king was killed
+					
+					if game.getCommand() == "v":
+						menu.printVictory()
+						
+					battle = False
+					input("\nPress Any Key To Continue")
+>>>>>>> eb061adeb4e6c8106081943526b2529784bf9493
 				
 			# result of turn
 			chess.printBoard()
+		
+		# close the connections after game is over
+		if menu.getHost():
+			conn.hostCloseConnection()
+			conn.resetConnection()
+			del game
+		else:
+			conn.clientCloseConnection()
+			conn.resetConnection()
+			del game
 
 ###
 ### EXECUTE PROGRAM HERE
