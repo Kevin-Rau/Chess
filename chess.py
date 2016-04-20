@@ -929,7 +929,7 @@ class Menu:
 			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
 			i += 2
 		print("")
-		exit = input('Press any key to return to the main menu: ')
+		exit = input('Press any key to return to the main menu.')
 		return
 		
 ###
@@ -1019,9 +1019,6 @@ def main():
 		# determine game mode & load correctly
 		menu.gameMode()
 		mode = menu.runMode()
-		menu.printTitle()
-		menu.askPlayerName()
-		menu.askUnicode()
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
@@ -1052,17 +1049,22 @@ def main():
 			# you should never get here
 			sys.exit()
 		
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
+		
 		# exchange user names here
 		if menu.getHost():
 			message = conn.receiveFromClient()
 			menu.setOpponentName(message)
-			time.sleep(0.2)
 			conn.sendToClient(menu.getUsername())
 		else:
-			time.sleep(0.2)
 			conn.sendToHost(menu.getUsername())
 			message = conn.receiveFromHost()
 			menu.setOpponentName(message)
+
+		print(menu.getUsername())
+		print(menu.getOpponentName())
 
 		menu.printOptions()
 		
