@@ -740,6 +740,7 @@ class Menu:
 	_username = ''
 	_unicode = None
 	_loadfile = None
+	_statsfile = None
 
 	def printTitle(self):
 		print("")
@@ -774,13 +775,20 @@ class Menu:
 			### connect to a game ###
 			return 'connecting'
 		elif self._gameType == 3:
-			print("we are all winners here!")
-			sys.exit()
+			array = []
+			reader = csv.reader(open('stats.txt', 'r'), delimiter=',')
+			for x in reader:
+				array.append(x)
+			self._statsfile = array[0]
+			return 'displaying'
 		elif self._gameType == 4:
 			sys.exit()
 
 	def getFileData(self):
 		return self._loadfile
+
+	def getStatsData(self):
+		return self._statsfile
 
 	def askPlayerName(self):
 		self._username = input('Enter Username: ')
@@ -819,6 +827,27 @@ class Menu:
 			f.write(str(game.getPlayerTurn()) + ",")
 			for x in board.getBoardAsArray():
 				f.write(x)
+
+	def displayStatsBoard(self):
+		print("")
+		print("██▓███   █     █░███▄    █     ▄▄▄▄    ▒█████   ▄▄▄       ██▀███  ▓█████▄   ")
+		print("▓██░  ██▒▓█░ █ ░█░██ ▀█   █    ▓█████▄ ▒██▒  ██▒▒████▄    ▓██ ▒ ██▒▒██▀ ██▌ ")
+		print("▓██░ ██▓▒▒█░ █ ░█▓██  ▀█ ██▒   ▒██▒ ▄██▒██░  ██▒▒██  ▀█▄  ▓██ ░▄█ ▒░██   █▌ ")
+		print("▒██▄█▓▒ ▒░█░ █ ░█▓██▒  ▐▌██▒   ▒██░█▀  ▒██   ██░░██▄▄▄▄██ ▒██▀▀█▄  ░▓█▄   ▌ ")
+		print("▒██▒ ░  ░░░██▒██▓▒██░   ▓██░   ░▓█  ▀█▓░ ████▓▒░ ▓█   ▓██▒░██▓ ▒██▒░▒████▓  ")
+		print("▒▓▒░ ░  ░░ ▓░▒ ▒ ░ ▒░   ▒ ▒    ░▒▓███▀▒░ ▒░▒░▒░  ▒▒   ▓▒█░░ ▒▓ ░▒▓░ ▒▒▓  ▒  ")
+		print("░▒ ░       ▒ ░ ░ ░ ░░   ░ ▒░   ▒░▒   ░   ░ ▒ ▒░   ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ▒  ▒  ")
+		print("░░         ░   ░    ░   ░ ░     ░    ░ ░ ░ ░ ▒    ░   ▒     ░░   ░  ░ ░  ░  ")
+		print("             ░            ░     ░          ░ ░        ░  ░   ░        ░     ")
+		print("                                      ░                              ░      ")
+		print("")
+		i = 0
+		while i < len(self._statsfile)-1:
+			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
+			i += 2
+		print("")
+
+
 				
 	def printExit(self):
 		print("")
@@ -889,10 +918,7 @@ def main():
 		# determine game mode & load correctly
 		menu.gameMode()
 		mode = menu.runMode()
-		menu.printTitle()
-		menu.askPlayerName()
-		menu.askUnicode()
-		menu.printOptions()
+		
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
@@ -914,10 +940,17 @@ def main():
 			conn.connectToGame(address)
 			hi = conn.receive() # test
 			print(hi)
+		elif mode == 'displaying':
+			menu.displayStatsBoard()	
+			break
 		else:
 			# you should never get here
 			sys.exit()
-		
+			
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
+		menu.printOptions()
 		chess.printBoard()
 		
 		# game logic goes here
