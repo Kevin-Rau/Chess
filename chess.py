@@ -620,6 +620,7 @@ class Game:
 	_input = ''
 	_command = ''
 	_winner = None
+	_loser = None
 	
 	def __init__(self,currentPlayer,player = True):
 		self._thisPlayer = currentPlayer
@@ -740,6 +741,9 @@ class Game:
 			if not board.getGameStatus():
 				self._command = 'w'
 				self._winner = self._playerturn
+<<<<<<< HEAD
+				self._loser = not self._playerturn
+>>>>>>> eb061adeb4e6c8106081943526b2529784bf9493
 		self.switchPlayerTurn()
 		return True
 		
@@ -767,6 +771,10 @@ class Game:
 
 	def getWinner(self):
 		return 'white' if self._winner else 'black'
+
+	def getLoser(self):
+		return 'white' if not self._winner else 'black'
+
 
 ###
 ### Menu
@@ -893,6 +901,10 @@ class Menu:
 		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
 		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
 		print("")
+
+	def storeStats(self, game):
+		with open('stats.txt', 'a') as f:
+			f.write(game.getWinner() + "," + game.getLoser() + ",") 
 
 	def displayStatsBoard(self):
 		print("")
@@ -1043,6 +1055,7 @@ def main():
 			# player turn
 			game.printPlayerTurn()
 			
+<<<<<<< HEAD
 			# current player turn
 			if game.getThisPlayerColor() == game.getPlayerTurn():
 			
@@ -1116,6 +1129,7 @@ def main():
 						
 					battle = False
 					input("\nPress Any Key To Continue")
+>>>>>>> eb061adeb4e6c8106081943526b2529784bf9493
 				
 			# result of turn
 			chess.printBoard()
