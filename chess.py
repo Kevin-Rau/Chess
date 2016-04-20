@@ -1024,9 +1024,7 @@ def main():
 		# determine game mode & load correctly
 		menu.gameMode()
 		mode = menu.runMode()
-		menu.printTitle()
-		menu.askPlayerName()
-		menu.askUnicode()
+		
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
@@ -1057,6 +1055,9 @@ def main():
 			# you should never get here
 			sys.exit()
 
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
 		menu.printOptions()
 		chess.printBoard()
 		
