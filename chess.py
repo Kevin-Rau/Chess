@@ -929,10 +929,10 @@ def main():
 		elif mode == 'hosting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
-			#conn.hostGame()
-			#conn.printHostName()
-			#conn.waitForClient()
-			#input("Waiting...")
+			conn.hostGame()
+			conn.printHostName()
+			conn.waitForClient()
+			input("Waiting...")
 		elif mode == 'connecting':
 			chess = Board(menu.getUnicode(),'newgame',None)
 			game = Game()
@@ -946,7 +946,7 @@ def main():
 		else:
 			# you should never get here
 			sys.exit()
-			
+
 		menu.printTitle()
 		menu.askPlayerName()
 		menu.askUnicode()
