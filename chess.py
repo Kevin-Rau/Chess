@@ -1044,11 +1044,13 @@ def main():
 			sys.exit()
 
 		menu.printOptions()
-		chess.printBoard()
 		
 		# game logic goes here
 		battle = True # game flag
 		while battle:
+			
+			# result of turn
+			chess.printBoard()
 			
 			# player turn
 			game.printPlayerTurn()
@@ -1126,9 +1128,6 @@ def main():
 						
 					battle = False
 					input("\nPress Any Key To Continue")
-				
-			# result of turn
-			chess.printBoard()
 		
 		# close the connections after game is over
 		if menu.getHost():
