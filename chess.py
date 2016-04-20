@@ -622,6 +622,7 @@ class Game:
 	_input = ''
 	_command = ''
 	_winner = None
+	_loser = None
 	
 	def __init__(self,player = True):
 		self._playerturn = player
@@ -724,12 +725,17 @@ class Game:
 			if not board.getGameStatus():
 				self._command = 'l'
 				self._winner = self._playerturn
+				self._loser = not self._playerturn
 				return False
 		self.switchPlayerTurn()
 		return True	
 
 	def getWinner(self):
 		return 'white' if self._winner else 'black'
+
+	def getLoser(self):
+		return 'white' if not self._winner else 'black'
+
 
 ###
 ### Menu
@@ -827,6 +833,10 @@ class Menu:
 			f.write(str(game.getPlayerTurn()) + ",")
 			for x in board.getBoardAsArray():
 				f.write(x)
+
+	def storeStats(self, game):
+		with open('stats.txt', 'a') as f:
+			f.write(game.getWinner() + "," + game.getLoser() + ",") 
 
 	def displayStatsBoard(self):
 		print("")
@@ -972,6 +982,7 @@ def main():
 					time.sleep(3)
 				elif game.getCommand() == 'l':
 					print("The winner is: " + game.getWinner())
+					menu.storeStats(game)
 					menu.printGameOver()
 					time.sleep(3)
 				break
