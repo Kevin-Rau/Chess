@@ -619,6 +619,7 @@ class Game:
 	_destination = [None] * 2
 	_input = ''
 	_command = ''
+	_winner = None
 	
 	def __init__(self,currentPlayer,player = True):
 		self._thisPlayer = currentPlayer
@@ -738,6 +739,7 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 			if not board.getGameStatus():
 				self._command = 'w'
+				self._winner = self._playerturn
 		self.switchPlayerTurn()
 		return True
 		
@@ -763,6 +765,9 @@ class Game:
 			print("Uh... got opponent command I don't know. Most likely a connection error.")
 	
 
+	def getWinner(self):
+		return 'white' if self._winner else 'black'
+
 ###
 ### Menu
 ###
@@ -773,6 +778,7 @@ class Menu:
 	_username = ''
 	_unicode = None
 	_loadfile = None
+	_statsfile = None
 
 	def printTitle(self):
 		print("")
@@ -786,7 +792,7 @@ class Menu:
 		print("")
 
 	def gameMode(self):
-		game_list = ["Host A New Game", "Load & Host A Game", "Connect To A Game"]
+		game_list = ["Host A New Game", "Load & Host A Game", "Connect To A Game", "Dispay Stats"]
 		menu = SelectionMenu(game_list, "CHESS")
 		menu.show()
 		menu.join()
@@ -807,10 +813,20 @@ class Menu:
 			### connect to a game ###
 			return 'connecting'
 		elif self._gameType == 3:
+			array = []
+			reader = csv.reader(open('stats.txt', 'r'), delimiter=',')
+			for x in reader:
+				array.append(x)
+			self._statsfile = array[0]
+			return 'displaying'
+		elif self._gameType == 4:
 			sys.exit()
 
 	def getFileData(self):
 		return self._loadfile
+
+	def getStatsData(self):
+		return self._statsfile
 
 	def askPlayerName(self):
 		self._username = input('Enter Username: ')
@@ -867,7 +883,7 @@ class Menu:
 		
 	def printVictory(self):
 		print("\nYour Opponent Forfeited. You Win!!")
-			
+
 	def printQuit(self):
 		print("")
 		print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
@@ -876,6 +892,25 @@ class Menu:
 		print("██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝   ")
 		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
 		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
+		print("")
+
+	def displayStatsBoard(self):
+		print("")
+		print("██▓███   █     █░███▄    █     ▄▄▄▄    ▒█████   ▄▄▄       ██▀███  ▓█████▄   ")
+		print("▓██░  ██▒▓█░ █ ░█░██ ▀█   █    ▓█████▄ ▒██▒  ██▒▒████▄    ▓██ ▒ ██▒▒██▀ ██▌ ")
+		print("▓██░ ██▓▒▒█░ █ ░█▓██  ▀█ ██▒   ▒██▒ ▄██▒██░  ██▒▒██  ▀█▄  ▓██ ░▄█ ▒░██   █▌ ")
+		print("▒██▄█▓▒ ▒░█░ █ ░█▓██▒  ▐▌██▒   ▒██░█▀  ▒██   ██░░██▄▄▄▄██ ▒██▀▀█▄  ░▓█▄   ▌ ")
+		print("▒██▒ ░  ░░░██▒██▓▒██░   ▓██░   ░▓█  ▀█▓░ ████▓▒░ ▓█   ▓██▒░██▓ ▒██▒░▒████▓  ")
+		print("▒▓▒░ ░  ░░ ▓░▒ ▒ ░ ▒░   ▒ ▒    ░▒▓███▀▒░ ▒░▒░▒░  ▒▒   ▓▒█░░ ▒▓ ░▒▓░ ▒▒▓  ▒  ")
+		print("░▒ ░       ▒ ░ ░ ░ ░░   ░ ▒░   ▒░▒   ░   ░ ▒ ▒░   ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ▒  ▒  ")
+		print("░░         ░   ░    ░   ░ ░     ░    ░ ░ ░ ░ ▒    ░   ▒     ░░   ░  ░ ░  ░  ")
+		print("             ░            ░     ░          ░ ░        ░  ░   ░        ░     ")
+		print("                                      ░                              ░      ")
+		print("")
+		i = 0
+		while i < len(self._statsfile)-1:
+			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
+			i += 2
 		print("")
 		
 ###
@@ -991,10 +1026,13 @@ def main():
 			game = Game(False)
 			address = input("\nEnter The Host's Address: ")
 			conn.connectToGame(address)
+		elif mode == 'displaying':
+			menu.displayStatsBoard()	
+			break
 		else:
 			# you should never get here
 			sys.exit()
-		
+
 		menu.printOptions()
 		chess.printBoard()
 		
