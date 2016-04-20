@@ -856,6 +856,8 @@ class Menu:
 			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
 			i += 2
 		print("")
+		exit = input('Press any key to return to the main menu: ')
+		return
 
 
 				
@@ -952,7 +954,7 @@ def main():
 			print(hi)
 		elif mode == 'displaying':
 			menu.displayStatsBoard()	
-			break
+			continue
 		else:
 			# you should never get here
 			sys.exit()
