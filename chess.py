@@ -922,7 +922,6 @@ class Menu:
 			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
 			i += 2
 		print("")
-<<<<<<< HEAD
 		exit = input('Press any key to return to the main menu: ')
 		return
 
@@ -937,8 +936,6 @@ class Menu:
 		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
 		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
 		print("")
-=======
->>>>>>> eefea105144cb8206970440e549e7fab266412ed
 		
 ###
 ### Connect
