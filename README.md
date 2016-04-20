@@ -1,5 +1,5 @@
 # Chess
-An object oriented javascript chess game
+An object oriented python chess game
 
 ##THINGS TO DO:
 

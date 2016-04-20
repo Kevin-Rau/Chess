@@ -1063,7 +1063,7 @@ def main():
 			conn.sendToHost(menu.getUsername())
 			message = conn.receiveFromHost()
 			menu.setOpponentName(message)
-		
+
 		menu.printOptions()
 		
 		# game logic goes here
