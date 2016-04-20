@@ -954,7 +954,7 @@ class Connect:
 		self._port = 8080
 
 	def hostGame(self):
-		self._host = socket.gethostname()
+		self._host = socket.gethostbyname(socket.gethostname())
 		self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self._socket.bind((self._host, self._port))
 		self._socket.listen(1)
