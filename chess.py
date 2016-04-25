@@ -741,8 +741,6 @@ class Game:
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 			if not board.getGameStatus():
 				self._command = 'w'
-				self._winner = self._playerturn
-				self._loser = not self._playerturn
 		self.switchPlayerTurn()
 		return True
 		
@@ -754,8 +752,6 @@ class Game:
 		board.execute(self._playerturn,self._origin,self._destination)
 		if not board.getGameStatus():
 			self._command = 'l'
-			self._winner = self._playerturn
-			self._loser = not self._playerturn
 		self.switchPlayerTurn()
 		return True
 	
