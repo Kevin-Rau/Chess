@@ -21,6 +21,7 @@ Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into m
 ###
 ### MODULES
 ###
+import datetime
 import time
 import sys
 import json
@@ -753,6 +754,8 @@ class Game:
 		board.execute(self._playerturn,self._origin,self._destination)
 		if not board.getGameStatus():
 			self._command = 'l'
+			self._winner = self._playerturn
+			self._loser = not self._playerturn
 		self.switchPlayerTurn()
 		return True
 	
@@ -766,12 +769,17 @@ class Game:
 		else:
 			print("Uh... got opponent command I don't know. Most likely a connection error.")
 	
+	def setWinner(self, winner):
+		self._winner = winner
+
+	def setLoser(self, loser):
+		self._loser = loser
 
 	def getWinner(self):
-		return 'white' if self._winner else 'black'
+		return self._winner
 
 	def getLoser(self):
-		return 'white' if not self._winner else 'black'
+		return self._loser
 
 
 ###
@@ -908,8 +916,9 @@ class Menu:
 		print("")
 
 	def storeStats(self, game):
+		today = datetime.date.today()
 		with open('stats.txt', 'a') as f:
-			f.write(game.getWinner() + "," + game.getLoser() + ",") 
+			f.write(game.getWinner() + "," + game.getLoser() + "," + str(today) + ",") 
 
 	def displayStatsBoard(self):
 		print("")
@@ -925,9 +934,9 @@ class Menu:
 		print("                                      ░                              ░      ")
 		print("")
 		i = 0
-		while i < len(self._statsfile)-1:
-			print(self._statsfile[i] + " beat " + self._statsfile[i+1])
-			i += 2
+		while i < len(self._statsfile)-2:
+			print(self._statsfile[i] + " beat " + self._statsfile[i+1] + " - " + self._statsfile[i+2])
+			i += 3
 		print("")
 		exit = input('Press any key to return to the main menu.')
 		return
@@ -1111,6 +1120,9 @@ def main():
 				if game.getCommand() == 'w':
 					chess.printBoard()
 					menu.printWin()
+					game.setWinner(menu.getUsername())
+					game.setLoser(menu.getOpponentName())
+					menu.storeStats(game)
 					input("\nPress Any Key To Continue")
 					battle = False
 
@@ -1140,6 +1152,9 @@ def main():
 					if game.getCommand() == 'l':
 						chess.printBoard()
 						menu.printLoss()
+						game.setWinner(menu.getOpponentName())
+						game.setLoser(menu.getUsername())
+						menu.storeStats(game)
 						input("\nPress Any Key To Continue")
 						battle = False
 				else:
