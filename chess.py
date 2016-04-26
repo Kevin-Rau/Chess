@@ -585,8 +585,6 @@ class Board:
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
 		self.setPiece(dest[0],dest[1],piece)
-		print("dest[0]: " + str(dest[0]) + " " + str(type(dest[0])))
-		print("dest[1]: " + str(dest[1]) + " " + str(type(dest[1])))
 		if (piece.getID() == 'P' or piece.getID() == '\u265F') and any(deadpiece.getColor() == False for deadpiece in self._dead) and dest[0] == 7:
 			trade = input('which piece would you like to reanimate?')
 			if any(deadpiece.getID() == trade and deadpiece.getColor() == False for deadpiece in self._dead):
