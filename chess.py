@@ -21,6 +21,7 @@ Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into m
 ###
 ### MODULES
 ###
+import datetime
 import time
 import sys
 import json
@@ -40,6 +41,16 @@ def checkEmpty(squares,board):
 		if type(piece) is not str:
 			return False
 	return True
+
+###
+### PIECE TRANSLATION DICTIONARIES
+###
+
+unicode_to_piece = {'\u2659':'UpPawn','\u265F':'DownPawn','\u265C':'Rook','\u2656':'Rook','\u265E':'Knight','\u2658':'Knight','\u265D':'Bishop','\u2657':'Bishop','\u265B':'Queen','\u2655':'Queen','\u265A':'King','\u2654':'King'}
+unicode_to_id = {'\u2659':'p','\u265F':'P','\u265C':'R','\u2656':'R','\u265E':'N','\u2658':'N','\u265D':'B','\u2657':'B','\u265B':'Q','\u2655':'Q','\u265A':'K','\u2654':'K'}
+id_to_piece = {'p':'UpPawn','P':'DownPawn','R':'Rook','N':'Knight','B':'Bishop','Q':'Queen','K':'King'}
+id_to_blackUnicode = {'P':'\u265F','R':'\u265C','N':'\u265E','B':'\u265D','Q':'\u265B','K':'\u265A'}
+id_to_whiteUnicode = {'p':'\u2659','R':'\u2656','N':'\u2658','B':'\u2657','Q':'\u2655','K':'\u2654'}
 
 ###
 ### PIECE
@@ -184,8 +195,6 @@ def Queen(orig,dest,board):
 			x = x + incr
 			y = y + incr
 		
-		print(squares)
-		
 		# check squares
 		valid = checkEmpty(squares,board)
 		if valid:
@@ -198,8 +207,6 @@ def Queen(orig,dest,board):
 		x = orig[0]
 		y = orig[1]
 		z = dest[0]
-		
-		print("hi!")
 		
 		# grab direction
 		if z > x:
@@ -216,8 +223,6 @@ def Queen(orig,dest,board):
 			squares.append((x,y))
 			x = x + row
 			y = y + col
-		
-		print(squares)
 		
 		# check squares
 		valid = checkEmpty(squares,board)
@@ -251,9 +256,7 @@ def Bishop(orig,dest,board):
 			squares.append((x,y))
 			x = x + incr
 			y = y + incr
-		
-		print(squares)
-		
+
 		# check squares
 		valid = checkEmpty(squares,board)
 		if valid:
@@ -266,8 +269,6 @@ def Bishop(orig,dest,board):
 		x = orig[0]
 		y = orig[1]
 		z = dest[0]
-		
-		print("hi!")
 		
 		# grab direction
 		if z > x:
@@ -284,8 +285,6 @@ def Bishop(orig,dest,board):
 			squares.append((x,y))
 			x = x + row
 			y = y + col
-		
-		print(squares)
 		
 		# check squares
 		valid = checkEmpty(squares,board)
@@ -431,6 +430,8 @@ class Board:
 	_board = [[' ' for x in range(8)] for x in range(8)]
 	_dead = []
 	_active = True
+	_tradepiece = None
+	
 	
 	def __init__(self,option,gameType,loaddata):
 		
@@ -440,13 +441,16 @@ class Board:
 				for y in range(8):
 					if option:
 						if loaddata[z] != 'empty':
-							self._board[x][y] = 'L' # Piece() unicode
+							if loaddata[z+1] == 'True':
+								self._board[x][y] = Piece(id_to_whiteUnicode[loaddata[z]],True,id_to_piece[loaddata[z]])
+							else:
+								self._board[x][y] = Piece(id_to_blackUnicode[loaddata[z]],False,id_to_piece[loaddata[z]])
 						else:
 							self._board[x][y] = ' '
 						z += 2
 					else:
 						if loaddata[z] != 'empty':
-							self._board[x][y] = 'L' # Piece() text
+							self._board[x][y] = Piece(loaddata[z],'True' == loaddata[z+1],id_to_piece[loaddata[z]])
 						else:
 							self._board[x][y] = ' '
 						z += 2
@@ -462,6 +466,9 @@ class Board:
 				self._board[0][7] = Piece('\u265C',False,Rook)
 				for i in range(8):
 					self._board[1][i] = Piece('\u265F',False,DownPawn)
+				for x in range(2,6):
+					for y in range(8):
+						self._board[x][y] = ' '
 				for i in range(8):
 					self._board[6][i] = Piece('\u2659',True,UpPawn)
 				self._board[7][0] = Piece('\u2656',True,Rook)
@@ -483,8 +490,11 @@ class Board:
 				self._board[0][7] = Piece('R',False,Rook)
 				for i in range(8):
 					self._board[1][i] = Piece('P',False,DownPawn)
+				for x in range(2,6):
+					for y in range(8):
+						self._board[x][y] = ' '
 				for i in range(8):
-					self._board[6][i] = Piece('P',True,UpPawn)
+					self._board[6][i] = Piece('p',True,UpPawn)
 				self._board[7][0] = Piece('R',True,Rook)
 				self._board[7][1] = Piece('N',True,Knight)
 				self._board[7][2] = Piece('B',True,Bishop)
@@ -539,6 +549,18 @@ class Board:
 		
 	def setGameStatus(self,boolean):
 		self._active = False
+
+	def setTradePiece(self, piece):
+		self._tradepiece = piece
+
+	def getTradePiece(self):
+		return self._tradepiece
+
+	def getTradePieceLocation(self):
+		return self._tradepiece_loc
+
+	def setTradePieceLocation(self, location):
+		self._tradepiece_loc = location
 	
 	def killPiece(self,attacked,player):
 		if type(attacked) is not str:
@@ -576,15 +598,44 @@ class Board:
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
 		self.setPiece(dest[0],dest[1],piece)
+		if piece.getID() == 'P' and any(deadpiece.getColor() == False for deadpiece in self._dead) and dest[0] == 7:
+			trade = input('which piece would you like to reanimate?')
+			if any(deadpiece.getID() == trade and deadpiece.getColor() == False for deadpiece in self._dead):
+				for deadpiece in self._dead:
+					if deadpiece.getID() == trade and deadpiece.getColor() == False:
+						self._tradepiece = deadpiece	
+						self.setPiece(dest[0],dest[1], deadpiece)
+		if piece.getID() == 'p'  and any(deadpiece.getColor() == True for deadpiece in self._dead) and dest[0] == 0:
+			trade = input('which piece would you like to reanimate?')
+			if any(deadpiece.getID() == trade and deadpiece.getColor() == True for deadpiece in self._dead):
+				for deadpiece in self._dead:
+					if deadpiece.getID() == trade and deadpiece.getColor() == True:
+						self._tradepiece = deadpiece	
+						self.setPiece(dest[0],dest[1], deadpiece)
+		if self._tradepiece:
+			self._dead.remove(self._tradepiece)
+
 		
 		return True
+
+	def tradePieces(self, game, pieceID):
+		location = game.getDestination()
+		if any(deadpiece.getID == pieceID for deadpiece in self._dead):
+			for deadpiece in self._dead:
+				if deadpiece.getID == pieceID:
+					tradepiece = deadpiece
+			self.setPiece(location[0], location[1], tradepiece)
+			
 
 	def getBoardAsArray(self):
 		array = []
 		for row in self._board:
 			for col in row:
 				if type(col) is not str:
-					piece = col.getID() + "," + str(col.getColor()) + ","
+					if len(col.getID()) != 1:
+						piece = unicode_to_id[col.getID()] + "," + str(col.getColor()) + ","
+					else:
+						piece = col.getID() + "," + str(col.getColor()) + ","
 				else:
 					piece = 'empty,empty,'
 				array.append(piece)
@@ -593,9 +644,6 @@ class Board:
 
 	def getBoard(self):
 		return self._board
-
-	def to_JSON(self):
-		return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 	
 ###
 ### GAME
@@ -604,13 +652,23 @@ class Game:
 	
 	# playerturn False black, True white
 	_playerturn = True
+	
+	# this player's color
+	_thisPlayer = None
+	
 	_origin = [None] * 2
 	_destination = [None] * 2
 	_input = ''
 	_command = ''
+	_winner = None
+	_loser = None
 	
-	def __init__(self):
-		self._playerturn = True
+	def __init__(self,currentPlayer,player = True):
+		self._thisPlayer = currentPlayer
+		self._playerturn = player
+	
+	def getThisPlayerColor(self):
+		return self._thisPlayer
 	
 	def getPlayerTurn(self):
 		return self._playerturn
@@ -652,6 +710,17 @@ class Game:
 			else:
 				return False
 
+	def movesToChess(self):
+		letter = {0:"a",1:"b",2:"c",3:"d",4:"e",5:"f",6:"g",7:"h"}
+		number = {0:"1",1:"2",2:"3",3:"4",4:"5",5:"6",6:"7",7:"8"}
+		moves = ''
+		moves += letter[self._origin[1]]
+		moves += number[self._origin[0]]
+		moves += ","
+		moves += letter[self._destination[1]]
+		moves += number[self._destination[0]]
+		return moves
+
 	def readCommand(self):
 		command = self._input.lower()
 		if command == 's' or command == 'save':
@@ -671,6 +740,7 @@ class Game:
 	def getCommand(self):
 		return self._command
 
+	# returns False if command is found, command stored in _command by readCommnand()
 	def askSquareOrigin(self, board):
 		self._input = input('Origin: ')
 		valid = self.chessToMatrix(True)
@@ -682,6 +752,7 @@ class Game:
 			valid = self.chessToMatrix(True)
 		return True
 		
+	# returns False if command is found, command stored in _command by readCommnand()
 	def askSquareDestination(self, board):
 		self._input = input('Destination: ')
 		valid = self.chessToMatrix(False)
@@ -698,8 +769,9 @@ class Game:
 
 	def getDestination(self):
 		return self._destination
-		
-	def execPlayerTurn(self,board):
+	
+	# returns False if command was input or game is over
+	def execCurrentPlayerTurn(self,board):
 		valid = False
 		while not valid :
 			if not self.askSquareOrigin(board):
@@ -708,20 +780,56 @@ class Game:
 				return False
 			valid = board.execute(self._playerturn,self._origin,self._destination)
 			if not board.getGameStatus():
-				self._command = 'l'
-				return False
+				self._command = 'w'
 		self.switchPlayerTurn()
-		return True	
+		return True
+		
+	def execOpponentPlayerTurn(self,board,origin,destination):
+		self._input = origin
+		self.chessToMatrix(True)
+		self._input = destination
+		self.chessToMatrix(False)
+		board.execute(self._playerturn,self._origin,self._destination)
+		if not board.getGameStatus():
+			self._command = 'l'
+		self.switchPlayerTurn()
+		return True
+	
+	def execOpponentCommand(self,board,command):
+		if command == 'w':
+			self._command = "l" # loss
+		elif command == 'f':
+			self._command = 'v' # victory
+		elif command == 'q':
+			self._command = 'v' # victory
+		else:
+			print("Uh... got opponent command I don't know. Most likely a connection error.")
+	
+	def setWinner(self, winner):
+		self._winner = winner
+
+	def setLoser(self, loser):
+		self._loser = loser
+
+	def getWinner(self):
+		return self._winner
+
+	def getLoser(self):
+		return self._loser
+
 
 ###
 ### Menu
 ###
 class Menu:			
 
+	_host = False
 	_gameType = None
 	_username = ''
+	_opponentname = ''
 	_unicode = None
 	_loadfile = None
+	_statsfile = None
 
 	def printTitle(self):
 		print("")
@@ -735,7 +843,7 @@ class Menu:
 		print("")
 
 	def gameMode(self):
-		game_list = ["Host A Game", "Load A Game", "Connect To A Game"]
+		game_list = ["Host A New Game", "Load & Host A Game", "Connect To A Game", "Dispay Stats"]
 		menu = SelectionMenu(game_list, "CHESS")
 		menu.show()
 		menu.join()
@@ -756,14 +864,39 @@ class Menu:
 			### connect to a game ###
 			return 'connecting'
 		elif self._gameType == 3:
+			array = []
+			reader = csv.reader(open('stats.txt', 'r'), delimiter=',')
+			for x in reader:
+				array.append(x)
+			self._statsfile = array[0]
+			return 'displaying'
+		elif self._gameType == 4:
 			sys.exit()
 
 	def getFileData(self):
 		return self._loadfile
 
+	def getStatsData(self):
+		return self._statsfile
+
 	def askPlayerName(self):
 		self._username = input('Enter Username: ')
 		
+	def getUsername(self):
+		return self._username
+		
+	def setOpponentName(self,name):
+		self._opponentname = name
+		
+	def getOpponentName(self):
+		return self._opponentname
+	
+	def getHost(self):
+		return self._host
+		
+	def setHost(self):
+		self._host = True
+	
 	def askUnicode(self):
 		valid = False
 		while not valid:
@@ -789,22 +922,26 @@ class Menu:
 		print("Press Any Key To Continue")
 		print("")
 		input('')
-		
-	def printGameOver(self):
-		print("\ngame over... resetting in 3 seconds")
 
 	def saveGame(self,game,board):
 		with open('chessGame.txt', 'w+') as f:
 			f.write(str(game.getPlayerTurn()) + ",")
 			for x in board.getBoardAsArray():
 				f.write(x)
+	
+	def printLoss(self):
+		print("\nYou Lost.")
+		
+	def printWin(self):
+		print("\nYou Won!")
+		
+	def printForfeit(self):
+		print("\nYou Forfeited. Game resetting in 3 seconds...")
+		
+	def printVictory(self):
+		print("\nYour Opponent Forfeited. You Win!!")
 
-	def save(self,board):
-		with open('game.json', 'w') as outfile:
-			json.dump(board.getBoardAsArray(), outfile)
-			#json.dump(Game._playerturn, outfile)	
-				
-	def printExit(self):
+	def printQuit(self):
 		print("")
 		print(" ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗ ")
 		print("██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝ ")
@@ -813,6 +950,32 @@ class Menu:
 		print("╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗ ")
 		print(" ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝ ")
 		print("")
+
+	def storeStats(self, game):
+		today = datetime.date.today()
+		with open('stats.txt', 'a') as f:
+			f.write(game.getWinner() + "," + game.getLoser() + "," + str(today) + ",") 
+
+	def displayStatsBoard(self):
+		print("")
+		print("██▓███   █     █░███▄    █     ▄▄▄▄    ▒█████   ▄▄▄       ██▀███  ▓█████▄   ")
+		print("▓██░  ██▒▓█░ █ ░█░██ ▀█   █    ▓█████▄ ▒██▒  ██▒▒████▄    ▓██ ▒ ██▒▒██▀ ██▌ ")
+		print("▓██░ ██▓▒▒█░ █ ░█▓██  ▀█ ██▒   ▒██▒ ▄██▒██░  ██▒▒██  ▀█▄  ▓██ ░▄█ ▒░██   █▌ ")
+		print("▒██▄█▓▒ ▒░█░ █ ░█▓██▒  ▐▌██▒   ▒██░█▀  ▒██   ██░░██▄▄▄▄██ ▒██▀▀█▄  ░▓█▄   ▌ ")
+		print("▒██▒ ░  ░░░██▒██▓▒██░   ▓██░   ░▓█  ▀█▓░ ████▓▒░ ▓█   ▓██▒░██▓ ▒██▒░▒████▓  ")
+		print("▒▓▒░ ░  ░░ ▓░▒ ▒ ░ ▒░   ▒ ▒    ░▒▓███▀▒░ ▒░▒░▒░  ▒▒   ▓▒█░░ ▒▓ ░▒▓░ ▒▒▓  ▒  ")
+		print("░▒ ░       ▒ ░ ░ ░ ░░   ░ ▒░   ▒░▒   ░   ░ ▒ ▒░   ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ▒  ▒  ")
+		print("░░         ░   ░    ░   ░ ░     ░    ░ ░ ░ ░ ▒    ░   ▒     ░░   ░  ░ ░  ░  ")
+		print("             ░            ░     ░          ░ ░        ░  ░   ░        ░     ")
+		print("                                      ░                              ░      ")
+		print("")
+		i = 0
+		while i < len(self._statsfile)-2:
+			print(self._statsfile[i] + " beat " + self._statsfile[i+1] + " - " + self._statsfile[i+2])
+			i += 3
+		print("")
+		exit = input('Press any key to return to the main menu.')
+		return
 		
 ###
 ### Connect
@@ -836,24 +999,56 @@ class Connect:
 		self._port = 8080
 
 	def hostGame(self):
-		self._host = socket.gethostname()
+		self._host = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+		self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self._socket.bind((self._host, self._port))
 		self._socket.listen(1)
+		
+	def printHostName(self):
+		print(Back.WHITE + Fore.BLACK + "\nTell Player 2 To Connect To This Address:")
+		print(Back.BLUE + Style.BRIGHT + Fore.WHITE + self._host)
+		print(Style.RESET_ALL + "",end="")
+
+	def waitForClient(self):
+		print("\nWaiting for connection...")
+		self._connection, self._addr = self._socket.accept() # blocking, waits for connection
 
 	def connectToGame(self,address):
 		self._socket.connect((address, self._port))
 	
-	def waitForClient(self):
-		self._connection, self._addr = self._connection.accept()
-	
-	def receiveFromClient(self):
-		return self._connection.recv(1024)
+	# client calls this
+	def receiveFromHost(self):
+		message = self._socket.recv(1024) # blocking, waits for connection
+		return message.decode("utf-8")
 		
+	# host calls this
+	def receiveFromClient(self):
+		message = self._connection.recv(1024) # blocking, waits for connection
+		return message.decode("utf-8")
+		
+	# client calls this
+	def sendToHost(self,output):
+		self._socket.send(str.encode(output))	
+		
+	# host calls this
 	def sendToClient(self,output):
-		self._connection.sendall(output)
+		self._connection.send(str.encode(output))
 	
-	def closeClient(self):
+	# client closes their connection
+	def clientCloseConnection(self):
+		self._socket.close()
+
+	# host closes client connection
+	def hostCloseConnection(self):
 		self._connection.close()
+		self._socket.close()
+		self._socket = None
+		
+	# reset the connection after a game ends
+	def resetConnection(self):
+		self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self._host = socket.gethostname()
+		self._port = 8080
 	
 ###
 ### MAIN PROGRAM
@@ -864,54 +1059,185 @@ def main():
 	menu = Menu()
 	conn = Connect()
 	
-	while True:
+	war = True # program flag
+	while war:
 		# determine game mode & load correctly
 		menu.gameMode()
 		mode = menu.runMode()
-		menu.printTitle()
-		menu.askPlayerName()
-		menu.askUnicode()
-		menu.printOptions()
 		
 		if mode == 'loading':
 			chess = Board(menu.getUnicode(),'loadgame',menu.getFileData())
-			game = Game()
+			if menu.getFileData()[0] == 'True':
+				game = Game(True,True)
+			else:
+				game = Game(True,False)
+			menu.setHost()
+			conn.hostGame()
+			conn.printHostName()
+			conn.waitForClient()
 		elif mode == 'hosting':
 			chess = Board(menu.getUnicode(),'newgame',None)
-			game = Game()
+			game = Game(True)
+			menu.setHost()
+			conn.hostGame()
+			conn.printHostName()
+			conn.waitForClient()
 		elif mode == 'connecting':
 			chess = Board(menu.getUnicode(),'newgame',None)
-			game = Game()
+			game = Game(False)
+			address = input("\nEnter The Host's Address: ")
+			conn.connectToGame(address)
+		elif mode == 'displaying':
+			menu.displayStatsBoard()	
+			continue
 		else:
 			# you should never get here
 			sys.exit()
 		
-		chess.printBoard()
+		menu.printTitle()
+		menu.askPlayerName()
+		menu.askUnicode()
+		
+		# exchange user names here
+		if menu.getHost():
+			message = conn.receiveFromClient()
+			menu.setOpponentName(message)
+			conn.sendToClient(menu.getUsername())
+		else:
+			conn.sendToHost(menu.getUsername())
+			message = conn.receiveFromHost()
+			menu.setOpponentName(message)
+
+		print(menu.getUsername())
+		print(menu.getOpponentName())
+
+		menu.printOptions()
 		
 		# game logic goes here
-		while True:
+		battle = True # game flag
+		while battle:
+			
+			# result of turn
+			chess.printBoard()
 			
 			# player turn
 			game.printPlayerTurn()
 			
-			# run player turn, if returned false, get reason and act
-			if not game.execPlayerTurn(chess):
-				if game.getCommand() == 'q':
-					menu.printExit()
-					return
-				elif game.getCommand() == 's':
-					menu.saveGame(game,chess)
-					continue	
-				elif game.getCommand() == 'f':
-					menu.printGameOver()
-					time.sleep(3)
-				elif game.getCommand() == 'l':
-					menu.printGameOver()
-					time.sleep(3)
-				break
+			# current player turn
+			if game.getThisPlayerColor() == game.getPlayerTurn():
+			
+				# if False returned, process command
+				if not game.execCurrentPlayerTurn(chess):
+					if game.getCommand() == 'q':
+						message = game.getCommand()
+						menu.printQuit()
+						battle = False
+						war = False
+					elif game.getCommand() == 's':
+						menu.saveGame(game,chess)
+						# continue will skip everything and return to input prompt
+						continue
+					elif game.getCommand() == 'f':
+						message = game.getCommand()
+						menu.printForfeit()
+						time.sleep(3)
+						battle = False
+				else:
 				
-			# result of turn
-			chess.printBoard()
+					# send the player's move to the opponent
+					if chess.getTradePiece():
+						message = chess.getTradePiece().getID() + "," + game.movesToChess()
+					else:
+						message = game.movesToChess()
+					
+				if menu.getHost():
+					conn.sendToClient(message)
+				else:
+					conn.sendToHost(message)
+					
+				# check if the game is over
+				if game.getCommand() == 'w':
+					chess.printBoard()
+					menu.printWin()
+					game.setWinner(menu.getUsername())
+					game.setLoser(menu.getOpponentName())
+					menu.storeStats(game)
+					input("\nPress Any Key To Continue")
+					battle = False
+
+			# wait for opponent
+			else:
+				
+				print("Waiting for opponent to move...")
+				
+				# wait for opponent player, then get their turn
+				if menu.getHost():
+					message = conn.receiveFromClient()
+				else:
+					message = conn.receiveFromHost()
+
+				moves = message.split(",")
+				if len(moves) > 1:
+					
+				
+					# print opponent's move
+					print(message)
+					
+					origin = moves[0]
+					destination = moves[1]
+					
+					# run the opponent's player turn
+					game.execOpponentPlayerTurn(chess,origin,destination)
+					
+					# check if the game is over
+					if game.getCommand() == 'l':
+						chess.printBoard()
+						menu.printLoss()
+						game.setWinner(menu.getOpponentName())
+						game.setLoser(menu.getUsername())
+						menu.storeStats(game)
+						input("\nPress Any Key To Continue")
+						battle = False
+
+				elif len(moves) > 2:
+					tradepieceID = moves[0]
+					origin = moves[1]
+					destination = moves[2]
+
+					game.execOpponentPlayerTurn(chess,origin,destination)
+					chess.tradePieces(game, tradepieceID)
+					
+					# check if the game is over
+					if game.getCommand() == 'l':
+						chess.printBoard()
+						menu.printLoss()
+						game.setWinner(menu.getOpponentName())
+						game.setLoser(menu.getUsername())
+						menu.storeStats(game)
+						input("\nPress Any Key To Continue")
+						battle = False
+
+
+
+				else:
+					command = moves[0]
+					game.execOpponentCommand(chess,command) ### need to update chess board if king was killed
+					
+					if game.getCommand() == "v":
+						menu.printVictory()
+						
+					battle = False
+					input("\nPress Any Key To Continue")
+		
+		# close the connections after game is over
+		if menu.getHost():
+			conn.hostCloseConnection()
+			conn.resetConnection()
+			del game
+		else:
+			conn.clientCloseConnection()
+			conn.resetConnection()
+			del game
 
 ###
 ### EXECUTE PROGRAM HERE
