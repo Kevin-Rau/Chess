@@ -430,6 +430,7 @@ class Board:
 	_board = [[' ' for x in range(8)] for x in range(8)]
 	_dead = []
 	_active = True
+	_tradepiece = None
 	
 	def __init__(self,option,gameType,loaddata):
 		
@@ -584,6 +585,23 @@ class Board:
 		# move the piece to the destination
 		self.setPiece(orig[0],orig[1],' ')
 		self.setPiece(dest[0],dest[1],piece)
+		if (piece.getID() == 'P' or piece.getID() == '\u265F') and any(deadpiece.getColor() == False for deadpiece in self._dead):
+			trade = input('which piece would you like to reanimate?')
+			if any(deadpiece.getID() == trade and deadpiece.getColor() == False for deadpiece in self._dead):
+				for deadpiece in self._dead:
+					if deadpiece.getID() == trade and deadpiece.getColor() == False:
+						self._tradepiece = deadpiece	
+						self.setPiece(dest[0],dest[1], deadpiece)
+		if (piece.getID() == 'p' or piece.getID() == '\u2659') and any(deadpiece.getColor() == True for deadpiece in self._dead):
+			trade = input('which piece would you like to reanimate?')
+			if any(deadpiece.getID() == trade and deadpiece.getColor() == True for deadpiece in self._dead):
+				for deadpiece in self._dead:
+					if deadpiece.getID() == trade and deadpiece.getColor() == True:
+						self._tradepiece = deadpiece	
+						self.setPiece(dest[0],dest[1], deadpiece)
+		if self._tradepiece:
+			self._dead.remove(self._tradepiece)
+			self._tradepiece = None
 		
 		return True
 
