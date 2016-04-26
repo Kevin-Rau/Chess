@@ -1,6 +1,10 @@
 # Chess
 An object oriented python chess game
 
+**Project Demo**
+
+https://youtu.be/9EVGJtWL_jA
+
 **Required Libraries**
 
 - Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama folder and run: python3 setup.py install
