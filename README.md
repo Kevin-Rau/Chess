@@ -3,8 +3,8 @@ An object oriented python chess game
 
 **Required Libraries**
 
-Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama folder and run: python3 setup.py install
-Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into menu folder, and run: python3 setup.py install
+- Download colorama @ https://pypi.python.org/pypi/colorama, cd into the colorama folder and run: python3 setup.py install
+- Download curses-menu @ https://pypi.python.org/pypi/curses-menu/0.5.0, cd into menu folder, and run: python3 setup.py install
 
 **Needed Files**
 
@@ -20,5 +20,5 @@ Players can only connect to each other on local connections (i.e. same computer 
 
 **Unfixed Issues**
 
-Loading a game, only loads the board on the host (player 1), not the client (player 2)
-Pawn doesn't upgrade when it reaches the opponents first row.
+- Loading a game, only loads the board on the host (player 1), not the client (player 2)
+- Pawn doesn't upgrade when it reaches the opponents first row.
