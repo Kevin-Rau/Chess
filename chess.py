@@ -431,6 +431,7 @@ class Board:
 	_dead = []
 	_active = True
 	_tradepiece = None
+	_tradepiece_loc = None
 	
 	def __init__(self,option,gameType,loaddata):
 		
@@ -548,6 +549,18 @@ class Board:
 		
 	def setGameStatus(self,boolean):
 		self._active = False
+
+	def setTradePiece(self, piece):
+		self._tradepiece = piece
+
+	def getTradePiece(self):
+		return self._tradepiece
+
+	def getTradePieceLocation(self):
+		return self._tradepiece_loc
+
+	def setTradePieceLocation(self, location):
+		self._tradepiece_loc = location
 	
 	def killPiece(self,attacked,player):
 		if type(attacked) is not str:
@@ -591,19 +604,32 @@ class Board:
 				for deadpiece in self._dead:
 					if deadpiece.getID() == trade and deadpiece.getColor() == False:
 						self._tradepiece = deadpiece	
+						self._tradepiece_loc[0] = dest[0]
+						self._tradepiece_loc[1] = dest[1]
 						self.setPiece(dest[0],dest[1], deadpiece)
 		if (piece.getID() == 'p' or piece.getID() == '\u2659') and any(deadpiece.getColor() == True for deadpiece in self._dead) and dest[0] == 0:
 			trade = input('which piece would you like to reanimate?')
 			if any(deadpiece.getID() == trade and deadpiece.getColor() == True for deadpiece in self._dead):
 				for deadpiece in self._dead:
 					if deadpiece.getID() == trade and deadpiece.getColor() == True:
-						self._tradepiece = deadpiece	
+						self._tradepiece = deadpiece
+						self._tradepiece_loc[0] = dest[0]
+						self._tradepiece_loc[1] = dest[1]	
 						self.setPiece(dest[0],dest[1], deadpiece)
 		if self._tradepiece:
 			self._dead.remove(self._tradepiece)
-			self._tradepiece = None
+
 		
 		return True
+
+	def tradePieces(self, game, pieceID):
+		location = game.getDestination()
+		if any(deadpiece.getID == pieceID for deadpiece in self._dead):
+			for deadpiece in self._dead:
+				if deadpiece.getID == pieceID:
+					tradepiece = deadpiece
+			self.setPiece(location[0], location[1], tradepiece)
+			
 
 	def getBoardAsArray(self):
 		array = []
@@ -1123,7 +1149,10 @@ def main():
 				else:
 				
 					# send the player's move to the opponent
-					message = game.movesToChess()
+					if chess.getTradePiece():
+						message = chess.getTradePiece().getID() + "," + game.movesToChess()
+					else:
+						message = game.movesToChess()
 					
 				if menu.getHost():
 					conn.sendToClient(message)
@@ -1153,6 +1182,8 @@ def main():
 
 				moves = message.split(",")
 				if len(moves) > 1:
+					
+				
 					# print opponent's move
 					print(message)
 					
@@ -1171,6 +1202,27 @@ def main():
 						menu.storeStats(game)
 						input("\nPress Any Key To Continue")
 						battle = False
+
+				elif len(moves) > 2:
+					tradepieceID = moves[0]
+					origin = moves[1]
+					destination = moves[2]
+
+					game.execOpponentPlayerTurn(chess,origin,destination)
+					chess.tradePieces(game, tradepieceID)
+					
+					# check if the game is over
+					if game.getCommand() == 'l':
+						chess.printBoard()
+						menu.printLoss()
+						game.setWinner(menu.getOpponentName())
+						game.setLoser(menu.getUsername())
+						menu.storeStats(game)
+						input("\nPress Any Key To Continue")
+						battle = False
+
+
+
 				else:
 					command = moves[0]
 					game.execOpponentCommand(chess,command) ### need to update chess board if king was killed
