@@ -21,3 +21,4 @@ Players can only connect to each other on local connections (i.e. same computer 
 **Unfixed Issues**
 
 Loading a game, only loads the board on the host (player 1), not the client (player 2)
+Pawn doesn't upgrade when it reaches the opponents first row.
